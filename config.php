@@ -14,7 +14,7 @@ define('STATS_PASSWORD', 'change-me-please');
 define('TRACKER_TOKEN', 'change-this-token');
 
 // --- Timezone ---
-define('TIMEZONE', 'Europe/Vienna');
+define('TIMEZONE', 'Europe/Vienna'); // full list: php.net/timezones
 
 // --- Branding ---
 // Customize the dashboard to match your site's look.
