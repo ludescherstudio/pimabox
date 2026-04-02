@@ -104,6 +104,11 @@ if (isBot($ua)) exit;
 if (!empty(EXCLUDED_IPS) && in_array($ip, EXCLUDED_IPS, true)) exit;
 
 $page     = sanitize($_GET['p'] ?? '/', 255);
+
+// Normalize common index variants to /
+$page = preg_replace('|/index\.html?$|i', '/', $page);
+$page = preg_replace('|/index\.php$|i', '/', $page);
+if ($page === '') $page = '/';
 $referrer = sanitize($_GET['r'] ?? '', 512);
 
 $host = $_SERVER['HTTP_HOST'] ?? '';
