@@ -111,7 +111,7 @@ Open `yourdomain.com/pimabox` in your browser, enter your password, and see your
 Open `config.php` and change the accent color to match your site:
 
 ```php
-define('BRAND_COLOR', '#c4773a'); // any hex color
+define('BRAND_COLOR', '#0d9488'); // any hex color — avoid Google Fonts for GDPR compliance
 define('BRAND_NAME',  'My Site'); // shown in the dashboard header
 ```
 
@@ -184,7 +184,6 @@ define('BRAND_COLOR',       '#c4773a');          // Dashboard accent color
 define('BRAND_LOGO',        '');                 // Path/URL to logo image
 define('BRAND_NAME',        'My Site');          // Site name in header
 define('BRAND_FONT',        'Georgia, serif');   // Font stack
-define('BRAND_FONT_URL',    '');                 // Google Fonts URL
 
 define('DB_PATH',           __DIR__.'/cache/analytics.db'); // SQLite database path
 define('GEO_ENABLED',       true);               // Country lookup via ip-api.com
