@@ -183,7 +183,6 @@ define('TIMEZONE',          'Europe/Vienna');    // PHP timezone string
 define('BRAND_COLOR',       '#c4773a');          // Dashboard accent color
 define('BRAND_LOGO',        '');                 // Path/URL to logo image
 define('BRAND_NAME',        'My Site');          // Site name in header
-define('BRAND_FONT',        'Georgia, serif');   // Font stack
 
 define('DB_PATH',           __DIR__.'/cache/analytics.db'); // SQLite database path
 define('GEO_ENABLED',       true);               // Country lookup via ip-api.com
