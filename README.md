@@ -54,7 +54,7 @@ your-webroot/
 > Disallow: /cache/
 > ```
 
-### Step 2 — Set your passwords and timetone
+### Step 2 — Set your passwords and timezone
 
 Open `config.php` and set two things:
 
