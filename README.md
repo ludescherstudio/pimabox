@@ -34,7 +34,7 @@ Upload these files to your web root via FTP:
 ```
 your-webroot/
 ├── tracker.php
-├── stats.php
+├── pimabox.php
 ├── config.php
 ├── robots.txt      ← merge with yours if you already have one
 ├── .htaccess       ← add the Rewrite line if you already have one (see below)
@@ -44,7 +44,7 @@ your-webroot/
 
 > **Already have a `.htaccess`?** Don't overwrite it. Just add this one line:
 > ```apache
-> RewriteRule ^pimabox$ stats.php [L]
+> RewriteRule ^pimabox$ pimabox.php [L]
 > ```
 
 > **Already have a `robots.txt`?** Add these lines to it instead:
