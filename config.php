@@ -18,8 +18,6 @@ define('TIMEZONE', 'Europe/Vienna'); // full list: php.net/timezones
 define('BRAND_COLOR',    '#3b82f6');
 define('BRAND_LOGO',     '');                // e.g. '/assets/logo.svg'
 define('BRAND_NAME',     'pimabox');
-define('BRAND_FONT',     'system-ui, -apple-system, sans-serif');
-define('BRAND_FONT_URL', '');                // e.g. 'https://fonts.googleapis.com/css2?family=Lato'
 
 // --- Database ---
 define('DB_PATH', __DIR__ . '/cache/analytics.db');
