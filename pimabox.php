@@ -1,6 +1,6 @@
 <?php
 // ============================================================
-// pimabox — pimabox.php
+// pimabox — stats.php
 // ============================================================
 
 require_once __DIR__ . '/config.php';
@@ -39,10 +39,10 @@ if (isset($_GET['logout'])) {
 $authed = !empty($_SESSION['pimabox_auth']);
 
 // ---- Branding ----
-$brandColor   = defined('BRAND_COLOR')    ? BRAND_COLOR    : '#c4773a';
+$brandColor   = defined('BRAND_COLOR')    ? BRAND_COLOR    : '#3b82f6';
 $brandLogo    = defined('BRAND_LOGO')     ? BRAND_LOGO     : '';
-$brandName    = defined('BRAND_NAME')     ? BRAND_NAME     : 'My Site';
-$brandFont    = defined('BRAND_FONT')     ? BRAND_FONT     : 'Georgia, serif';
+$brandName    = defined('BRAND_NAME')     ? BRAND_NAME     : 'pimabox';
+$brandFont    = defined('BRAND_FONT')     ? BRAND_FONT     : 'system-ui, -apple-system, sans-serif';
 $brandFontUrl = defined('BRAND_FONT_URL') ? BRAND_FONT_URL : '';
 $advancedMode = defined('ADVANCED_MODE')  ? ADVANCED_MODE  : false;
 
@@ -219,11 +219,11 @@ if ($isLocked) {
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
   :root {
     --accent:  <?= htmlspecialchars($brandColor) ?>;
-    --bg:      #faf8f5;
+    --bg:      #f5f7fa;
     --surface: #ffffff;
-    --border:  #e8e0d4;
-    --text:    #2c2416;
-    --muted:   #8a7a68;
+    --border:  #e2e6ed;
+    --text:    #1a202c;
+    --muted:   #718096;
     --danger:  #c0392b;
     --font:    <?= htmlspecialchars($brandFont) ?>;
     --sans:    system-ui, -apple-system, sans-serif;
@@ -316,14 +316,6 @@ if ($isLocked) {
   .dev-fill.mobile { opacity:.7; }
   .dev-fill.tablet { opacity:.45; }
   .dev-pct { font-size:.75rem; color:var(--muted); width:2.5rem; text-align:right; flex-shrink:0; }
-
-  /* World map */
-  .map-wrap { position:relative; width:100%; }
-  .map-wrap svg { width:100%; height:auto; display:block; }
-  .country-shape { fill:#f0e8de; stroke:#fff; stroke-width:.5; transition:fill .2s; cursor:default; }
-  .country-shape.has-data { fill:var(--accent); }
-  .country-shape.has-data:hover { opacity:.8; }
-  .map-tooltip { position:fixed; background:var(--text); color:#fff; padding:.3rem .6rem; border-radius:6px; font-size:.72rem; pointer-events:none; display:none; z-index:100; white-space:nowrap; }
 
   /* Table */
   .tbl-wrap { overflow-x:auto; }
@@ -556,70 +548,7 @@ if ($isLocked) {
   </div>
 </div>
 
-<!-- World Map -->
-<?php if (!empty($stats['countries'])): ?>
-<div class="card">
-  <h2>World Map</h2>
-  <?php $jsCountries = json_encode($stats['countries']); $jsMax = max($stats['countries']); ?>
-  <div class="map-wrap">
-    <div class="map-tooltip" id="map-tip"></div>
-    <svg viewBox="0 0 1010 666" xmlns="http://www.w3.org/2000/svg" id="world-map">
-      <g id="countries">
-        <path class="country-shape" id="US" d="M155,180 L155,200 L185,200 L195,215 L220,215 L220,200 L240,195 L255,200 L255,215 L270,215 L275,205 L290,205 L295,195 L310,190 L315,175 L300,165 L285,160 L270,155 L250,150 L230,148 L215,150 L200,155 L185,160 L170,165 Z"/>
-        <path class="country-shape" id="CA" d="M100,100 L100,155 L155,180 L170,165 L185,160 L200,155 L215,150 L230,148 L250,150 L260,140 L270,125 L265,110 L250,100 L230,90 L210,85 L190,80 L170,80 L150,85 L130,90 Z"/>
-        <path class="country-shape" id="MX" d="M155,215 L155,235 L170,250 L185,255 L200,255 L210,245 L215,235 L215,215 L195,215 L185,200 L155,200 Z"/>
-        <path class="country-shape" id="BR" d="M255,280 L250,310 L255,340 L270,360 L285,370 L300,375 L320,370 L335,360 L345,340 L345,310 L335,285 L320,270 L305,265 L290,265 L275,268 Z"/>
-        <path class="country-shape" id="AR" d="M270,370 L265,400 L268,430 L275,455 L285,465 L295,460 L300,440 L300,415 L300,375 L285,370 Z"/>
-        <path class="country-shape" id="GB" d="M460,140 L455,150 L460,160 L470,165 L475,155 L475,145 L468,138 Z"/>
-        <path class="country-shape" id="FR" d="M465,165 L460,175 L462,188 L472,195 L482,192 L488,182 L485,170 L475,163 Z"/>
-        <path class="country-shape" id="DE" d="M480,148 L475,158 L478,170 L488,175 L498,170 L502,160 L498,150 L488,145 Z"/>
-        <path class="country-shape" id="ES" d="M455,190 L450,202 L455,215 L468,220 L480,218 L487,208 L484,195 L472,188 Z"/>
-        <path class="country-shape" id="IT" d="M482,175 L480,185 L482,200 L488,210 L495,215 L500,208 L498,195 L494,182 L490,175 Z"/>
-        <path class="country-shape" id="PL" d="M495,148 L490,158 L492,168 L502,172 L512,168 L515,158 L510,148 L500,144 Z"/>
-        <path class="country-shape" id="UA" d="M515,148 L510,160 L512,172 L522,178 L535,175 L540,165 L538,153 L528,146 Z"/>
-        <path class="country-shape" id="RU" d="M510,90 L505,110 L510,130 L530,140 L560,145 L600,148 L640,145 L680,140 L710,135 L730,125 L735,110 L725,98 L700,90 L670,85 L640,82 L610,82 L580,85 L555,88 L530,90 Z"/>
-        <path class="country-shape" id="TR" d="M535,188 L530,198 L535,210 L548,215 L562,212 L568,202 L565,190 L553,185 Z"/>
-        <path class="country-shape" id="CN" d="M660,175 L655,195 L660,218 L678,232 L700,238 L720,235 L735,222 L738,205 L732,188 L718,178 L700,172 L682,170 Z"/>
-        <path class="country-shape" id="IN" d="M625,220 L620,240 L622,265 L632,285 L645,295 L658,292 L665,278 L665,258 L660,238 L648,222 Z"/>
-        <path class="country-shape" id="JP" d="M740,175 L735,185 L738,198 L748,205 L758,202 L762,190 L758,178 L748,172 Z"/>
-        <path class="country-shape" id="AU" d="M710,340 L705,365 L710,390 L728,408 L748,415 L768,410 L780,395 L782,372 L775,352 L760,338 L742,330 Z"/>
-        <path class="country-shape" id="ZA" d="M510,380 L505,400 L510,420 L522,432 L535,435 L548,428 L555,412 L552,395 L540,382 L525,375 Z"/>
-        <path class="country-shape" id="EG" d="M525,225 L520,238 L522,252 L532,260 L542,258 L548,245 L545,232 L535,224 Z"/>
-        <path class="country-shape" id="NG" d="M488,268 L483,282 L486,298 L496,308 L508,308 L515,298 L513,282 L502,270 Z"/>
-        <path class="country-shape" id="SA" d="M558,228 L553,242 L555,258 L565,268 L578,268 L585,258 L583,242 L572,230 Z"/>
-        <path class="country-shape" id="ID" d="M700,285 L695,295 L698,308 L710,315 L722,312 L728,300 L725,288 L712,280 Z"/>
-        <path class="country-shape" id="KR" d="M730,185 L725,195 L728,205 L738,210 L745,205 L748,195 L742,185 Z"/>
-        <path class="country-shape" id="AT" d="M492,162 L488,170 L490,178 L498,182 L506,178 L508,168 L503,160 Z"/>
-        <path class="country-shape" id="CH" d="M476,168 L472,176 L475,184 L483,188 L490,183 L491,174 L486,167 Z"/>
-        <path class="country-shape" id="NL" d="M474,148 L470,155 L472,163 L480,166 L486,161 L487,153 L481,147 Z"/>
-        <path class="country-shape" id="BE" d="M470,158 L466,165 L468,173 L476,176 L482,171 L482,163 L476,157 Z"/>
-        <path class="country-shape" id="SE" d="M492,108 L488,122 L490,138 L500,146 L510,143 L514,130 L512,116 L502,108 Z"/>
-        <path class="country-shape" id="NO" d="M475,100 L470,115 L472,130 L482,140 L492,138 L496,125 L493,110 L484,100 Z"/>
-        <path class="country-shape" id="FI" d="M505,105 L500,120 L502,135 L512,142 L522,138 L525,124 L522,110 L512,104 Z"/>
-        <path class="country-shape" id="DK" d="M480,135 L476,143 L480,152 L488,155 L494,150 L495,142 L490,135 Z"/>
-        <path class="country-shape" id="PT" d="M448,192 L444,202 L446,215 L454,220 L460,215 L461,202 L457,192 Z"/>
-        <path class="country-shape" id="GR" d="M508,198 L503,208 L505,220 L514,226 L522,222 L525,210 L521,198 Z"/>
-        <path class="country-shape" id="RO" d="M515,165 L510,175 L512,185 L522,190 L530,187 L532,177 L528,167 Z"/>
-        <path class="country-shape" id="CZ" d="M494,158 L490,166 L492,174 L500,178 L508,174 L510,166 L505,158 Z"/>
-        <path class="country-shape" id="HU" d="M504,170 L500,178 L502,186 L510,190 L518,186 L520,178 L515,170 Z"/>
-        <path class="country-shape" id="CO" d="M228,268 L223,280 L225,295 L235,305 L246,303 L250,291 L247,278 L237,268 Z"/>
-        <path class="country-shape" id="PK" d="M610,200 L605,215 L608,230 L620,240 L630,238 L635,224 L632,210 L620,202 Z"/>
-        <path class="country-shape" id="IR" d="M570,195 L565,208 L568,225 L578,235 L590,233 L595,220 L592,206 L582,196 Z"/>
-        <path class="country-shape" id="KZ" d="M578,148 L573,165 L576,182 L590,192 L605,190 L610,175 L606,160 L594,150 Z"/>
-        <path class="country-shape" id="TH" d="M672,248 L667,262 L670,278 L680,288 L690,285 L694,272 L690,258 L680,248 Z"/>
-        <path class="country-shape" id="VN" d="M688,248 L683,262 L686,278 L695,285 L702,280 L705,265 L700,250 Z"/>
-        <path class="country-shape" id="MY" d="M690,285 L685,295 L688,305 L698,310 L706,305 L708,293 L702,283 Z"/>
-        <path class="country-shape" id="MM" d="M662,238 L657,252 L660,268 L670,278 L680,275 L683,260 L678,244 Z"/>
-        <path class="country-shape" id="KE" d="M540,295 L535,310 L538,325 L548,332 L558,328 L560,315 L556,300 Z"/>
-        <path class="country-shape" id="ET" d="M540,268 L535,282 L538,298 L548,306 L558,303 L560,288 L555,274 Z"/>
-        <path class="country-shape" id="DZ" d="M470,210 L465,225 L468,242 L478,252 L490,250 L493,236 L488,222 Z"/>
-        <path class="country-shape" id="MA" d="M452,205 L447,218 L450,232 L460,240 L470,237 L472,224 L468,210 Z"/>
-      </g>
-    </svg>
-  </div>
-  <p class="section-note">Country detection requires GEO_ENABLED in config.php</p>
-</div>
-<?php endif; ?>
+
 
 <!-- Recent hits -->
 <div class="card">
@@ -643,7 +572,7 @@ if ($isLocked) {
       </tbody>
     </table>
   </div>
-  <p class="file-info">analytics.db · <?= $stats['db_size'] ?> KB · <?= number_format($stats['db_rows']) ?> rows · powered by <a href="https://github.com/ludescherstudio/pimabox" style="color:var(--muted)">pimabox</a></p>
+  <p class="file-info">analytics.db · <?= $stats['db_size'] ?> KB · <?= number_format($stats['db_rows']) ?> rows</p>
 </div>
 
 <?php endif; // total > 0 ?>
@@ -670,27 +599,9 @@ if ($isLocked) {
 
 </main>
 
-<script>
-(function() {
-  const data   = <?= $jsCountries ?? '{}' ?>;
-  const max    = <?= $jsMax ?? 1 ?>;
-  const tip    = document.getElementById('map-tip');
-  if (!tip) return;
-  Object.entries(data).forEach(([code, count]) => {
-    const el = document.getElementById(code);
-    if (!el) return;
-    el.classList.add('has-data');
-    el.style.opacity = 0.2 + (count / max) * 0.8;
-    el.addEventListener('mousemove', e => {
-      tip.style.display = 'block';
-      tip.style.left = (e.clientX + 12) + 'px';
-      tip.style.top  = (e.clientY - 28) + 'px';
-      tip.textContent = code + ': ' + count.toLocaleString() + ' views';
-    });
-    el.addEventListener('mouseleave', () => { tip.style.display = 'none'; });
-  });
-})();
-</script>
+<footer style="text-align:center;padding:1.5rem 1rem;font-size:.75rem;color:var(--muted);border-top:1px solid var(--border);margin-top:1rem;">
+  Powered by <a href="https://pimabox.com" style="color:var(--muted);text-decoration:underline;">pimabox</a> &mdash; <a href="https://github.com/ludescherstudio/pimabox" style="color:var(--muted);text-decoration:underline;">GitHub</a>
+</footer>
 
 <?php endif; // authed ?>
 </body>
