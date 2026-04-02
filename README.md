@@ -75,7 +75,7 @@ Replace `my-secret-word` with whatever you chose above.
 
 **Static HTML sites**
 
-Paste this into every HTML file you want to track — homepage, about, contact, imprint, blog posts, everything. It goes at the very end of your file, after your footer, directly before the closing `</body>` tag. If you're not sure where that is, search for `</body>` in your file — there's only one of them.
+Paste this into every HTML file you want to track — homepage, about, contact, imprint, blog posts, everything. It goes at the very end of your file, after your footer, directly before the closing `</body>` tag. If you're not sure where that is, search for `</body>` in your file — there's only one of them. Before you save, replace `my-secret-word` with the tracker token you set in Step 2.
 
 ```html
 <script>
@@ -87,7 +87,7 @@ fetch('/tracker.php?p=' + encodeURIComponent(location.pathname)
 
 **WordPress**
 
-Open your WordPress admin, go to **Appearance → Theme File Editor**, open `functions.php`, and paste this at the very end of the file:
+Open your WordPress admin, go to **Appearance → Theme File Editor**, open `functions.php`, and paste this at the very end of the file. Before you save, replace `my-secret-word` with the tracker token you set in Step 2.
 
 ```php
 function pimabox_tracker() { ?>
