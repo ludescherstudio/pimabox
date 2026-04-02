@@ -42,7 +42,7 @@ $authed = !empty($_SESSION['pimabox_auth']);
 $brandColor   = defined('BRAND_COLOR')    ? BRAND_COLOR    : '#0d9488';
 $brandLogo    = defined('BRAND_LOGO')     ? BRAND_LOGO     : '';
 $brandName    = defined('BRAND_NAME')     ? BRAND_NAME     : 'pimabox';
-$brandFont    = defined('BRAND_FONT')     ? BRAND_FONT     : 'system-ui, -apple-system, sans-serif';
+$brandFont    = 'system-ui, -apple-system, sans-serif';
 $advancedMode = defined('ADVANCED_MODE')  ? ADVANCED_MODE  : false;
 
 // ---- DB helper ----
