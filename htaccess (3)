@@ -1,0 +1,12 @@
+# Clean URL: meinedomain.at/stats → stats.php
+RewriteEngine On
+RewriteRule ^stats$ stats.php [L]
+
+# Block direct access to config and cache
+<Files "config.php">
+    Order Allow,Deny
+    Deny from all
+</Files>
+
+# Recommended: prevent directory listing
+Options -Indexes
