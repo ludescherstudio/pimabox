@@ -39,11 +39,10 @@ if (isset($_GET['logout'])) {
 $authed = !empty($_SESSION['pimabox_auth']);
 
 // ---- Branding ----
-$brandColor   = defined('BRAND_COLOR')    ? BRAND_COLOR    : '#3b82f6';
+$brandColor   = defined('BRAND_COLOR')    ? BRAND_COLOR    : '#0d9488';
 $brandLogo    = defined('BRAND_LOGO')     ? BRAND_LOGO     : '';
 $brandName    = defined('BRAND_NAME')     ? BRAND_NAME     : 'pimabox';
 $brandFont    = defined('BRAND_FONT')     ? BRAND_FONT     : 'system-ui, -apple-system, sans-serif';
-$brandFontUrl = defined('BRAND_FONT_URL') ? BRAND_FONT_URL : '';
 $advancedMode = defined('ADVANCED_MODE')  ? ADVANCED_MODE  : false;
 
 // ---- DB helper ----
@@ -90,30 +89,37 @@ if ($authed && $advancedMode && isset($_POST['clear_data']) && ($_POST['confirm_
 
 // ---- Data ----
 $stats = [
-    'total'      => 0,
-    'today'      => 0,
-    'uniq_today' => 0,
-    'uniq_total' => 0,
-    'pages'      => [],
-    'pages_prev' => [],
-    'referrers'  => [],
-    'devices'    => ['desktop' => 0, 'mobile' => 0, 'tablet' => 0],
-    'countries'  => [],
-    'trend'      => [],
-    'hours'      => array_fill(0, 24, ['views' => 0, 'uniq' => []]),
-    'recent'     => [],
-    'db_size'    => 0,
-    'db_rows'    => 0,
+    'total'       => 0,
+    'today'       => 0,
+    'uniq_today'  => 0,
+    'uniq_total'  => 0,
+    'this_week'   => 0,
+    'last_week'   => 0,
+    'this_month'  => 0,
+    'last_month'  => 0,
+    'pages'       => [],
+    'pages_prev'  => [],
+    'referrers'   => [],
+    'devices'     => ['desktop' => 0, 'mobile' => 0, 'tablet' => 0],
+    'countries'   => [],
+    'trend'       => [],
+    'hours'       => array_fill(0, 24, ['views' => 0, 'uniq' => []]),
+    'recent'      => [],
+    'db_size'     => 0,
+    'db_rows'     => 0,
 ];
 
 if ($authed) {
     $db = openDb();
     if ($db) {
-        $today     = date('Y-m-d');
-        $trendFrom = date('Y-m-d', strtotime('-' . (TREND_DAYS - 1) . ' days'));
-        $weekStart = date('Y-m-d', strtotime('Monday this week'));
-        $prevStart = date('Y-m-d', strtotime('Monday last week'));
-        $prevEnd   = date('Y-m-d', strtotime('Sunday last week'));
+        $today      = date('Y-m-d');
+        $trendFrom  = date('Y-m-d', strtotime('-' . (TREND_DAYS - 1) . ' days'));
+        $weekStart  = date('Y-m-d', strtotime('Monday this week'));
+        $prevStart  = date('Y-m-d', strtotime('Monday last week'));
+        $prevEnd    = date('Y-m-d', strtotime('Sunday last week'));
+        $monthStart = date('Y-m-01');
+        $lastMStart = date('Y-m-01', strtotime('first day of last month'));
+        $lastMEnd   = date('Y-m-t', strtotime('last month'));
 
         // Total views
         $stats['total'] = (int) $db->querySingle('SELECT COUNT(*) FROM hits');
@@ -126,6 +132,14 @@ if ($authed) {
 
         // Unique visitors total
         $stats['uniq_total'] = (int) $db->querySingle("SELECT COUNT(DISTINCT vid) FROM hits WHERE vid != ''");
+
+        // This week / last week
+        $stats['this_week'] = (int) $db->querySingle("SELECT COUNT(*) FROM hits WHERE date >= '$weekStart'");
+        $stats['last_week'] = (int) $db->querySingle("SELECT COUNT(*) FROM hits WHERE date >= '$prevStart' AND date <= '$prevEnd'");
+
+        // This month / last month
+        $stats['this_month'] = (int) $db->querySingle("SELECT COUNT(*) FROM hits WHERE date >= '$monthStart'");
+        $stats['last_month'] = (int) $db->querySingle("SELECT COUNT(*) FROM hits WHERE date >= '$lastMStart' AND date <= '$lastMEnd'");
 
         // Top pages (all time)
         $res = $db->query("SELECT page, COUNT(*) as c FROM hits GROUP BY page ORDER BY c DESC LIMIT 10");
@@ -195,6 +209,25 @@ if ($authed) {
     }
 }
 
+
+$countryNames = [
+    'AF'=>'Afghanistan','AL'=>'Albania','DZ'=>'Algeria','AR'=>'Argentina','AU'=>'Australia',
+    'AT'=>'Austria','BE'=>'Belgium','BR'=>'Brazil','BG'=>'Bulgaria','CA'=>'Canada',
+    'CL'=>'Chile','CN'=>'China','CO'=>'Colombia','HR'=>'Croatia','CZ'=>'Czechia',
+    'DK'=>'Denmark','EG'=>'Egypt','FI'=>'Finland','FR'=>'France','DE'=>'Germany',
+    'GR'=>'Greece','HK'=>'Hong Kong','HU'=>'Hungary','IN'=>'India','ID'=>'Indonesia',
+    'IE'=>'Ireland','IL'=>'Israel','IT'=>'Italy','JP'=>'Japan','KZ'=>'Kazakhstan',
+    'KE'=>'Kenya','KR'=>'South Korea','MY'=>'Malaysia','MX'=>'Mexico','MA'=>'Morocco',
+    'NL'=>'Netherlands','NZ'=>'New Zealand','NG'=>'Nigeria','NO'=>'Norway','PK'=>'Pakistan',
+    'PH'=>'Philippines','PL'=>'Poland','PT'=>'Portugal','RO'=>'Romania','RU'=>'Russia',
+    'SA'=>'Saudi Arabia','RS'=>'Serbia','SG'=>'Singapore','SK'=>'Slovakia','ZA'=>'South Africa',
+    'ES'=>'Spain','SE'=>'Sweden','CH'=>'Switzerland','TW'=>'Taiwan','TH'=>'Thailand',
+    'TR'=>'Turkey','UA'=>'Ukraine','AE'=>'UAE','GB'=>'United Kingdom','US'=>'United States',
+    'VN'=>'Vietnam','local'=>'Local',
+];
+function countryName(string $code, array $map): string {
+    return $map[$code] ?? $code;
+}
 $trendMax = 1;
 foreach ($stats['trend'] as $t) $trendMax = max($trendMax, $t['views']);
 $hourMax  = max(array_merge([1], array_column($stats['hours'], 'views')));
@@ -210,11 +243,8 @@ if ($isLocked) {
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title><?= htmlspecialchars($brandName) ?> · Stats</title>
-<?php if ($brandFontUrl): ?>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="<?= htmlspecialchars($brandFontUrl) ?>" rel="stylesheet">
-<?php endif; ?>
+<title><?= htmlspecialchars($brandName) ?> · Analytics · <?= date("d M Y") ?></title>
+
 <style>
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
   :root {
@@ -236,7 +266,8 @@ if ($isLocked) {
   .login-logo { margin-bottom:1.5rem; }
   .login-logo img { max-height:36px; max-width:160px; }
   .login-box h1 { font-family:var(--font); font-size:1.5rem; font-weight:700; margin-bottom:.25rem; }
-  .login-box .sub { font-size:.78rem; color:var(--muted); margin-bottom:1.75rem; text-transform:uppercase; letter-spacing:.05em; }
+  .login-box .sub { font-size:.78rem; color:var(--muted); margin-bottom:.4rem; text-transform:uppercase; letter-spacing:.05em; }
+  .login-box .tagline { font-size:.78rem; color:var(--muted); margin-bottom:1.5rem; font-style:italic; }
   .login-box input[type=password] { width:100%; padding:.7rem 1rem; border:1px solid var(--border); border-radius:10px; font-size:.95rem; background:var(--bg); color:var(--text); outline:none; transition:border-color .15s; }
   .login-box input[type=password]:focus { border-color:var(--accent); }
   .login-box input:disabled, .login-box button:disabled { opacity:.4; cursor:not-allowed; }
@@ -247,16 +278,23 @@ if ($isLocked) {
   .attempts-hint { font-size:.72rem; color:var(--muted); margin-top:.4rem; }
 
   /* Header */
-  header { background:var(--surface); border-bottom:1px solid var(--border); padding:1rem 1.5rem; display:flex; align-items:center; justify-content:space-between; gap:1rem; flex-wrap:wrap; }
+  header { background:#0d2d2b; border-bottom:1px solid #1a4a47; padding:1rem 1.5rem; display:flex; align-items:center; justify-content:space-between; gap:1rem; flex-wrap:wrap; }
   .header-brand { display:flex; align-items:center; gap:.75rem; }
   .header-brand img { max-height:28px; max-width:120px; }
-  .header-brand h1 { font-family:var(--font); font-size:1.2rem; font-weight:700; }
-  .header-meta { font-size:.75rem; color:var(--muted); }
+  .header-brand h1 { font-family:var(--font); font-size:1.2rem; font-weight:700; color:#fff; }
+  .header-tagline { font-size:.68rem; color:#5eada8; letter-spacing:.04em; margin-top:.1rem; }
+  .header-meta { font-size:.75rem; color:#5eada8; }
   .header-actions { display:flex; align-items:center; gap:.75rem; flex-wrap:wrap; }
-  .btn-ghost { background:none; border:1px solid var(--border); border-radius:8px; padding:.3rem .75rem; font-size:.78rem; color:var(--muted); cursor:pointer; transition:all .15s; text-decoration:none; display:inline-block; }
-  .btn-ghost:hover { border-color:var(--accent); color:var(--accent); }
+  .btn-ghost { background:none; border:1px solid #1a4a47; border-radius:8px; padding:.3rem .75rem; font-size:.78rem; color:#5eada8; cursor:pointer; transition:all .15s; text-decoration:none; display:inline-block; }
+  .btn-ghost:hover { border-color:#fff; color:#fff; }
   .btn-export { background:var(--accent); color:#fff; border:none; border-radius:8px; padding:.3rem .75rem; font-size:.78rem; cursor:pointer; text-decoration:none; display:inline-block; transition:opacity .15s; }
   .btn-export:hover { opacity:.85; }
+
+  /* Summary */
+  .summary { padding:1.75rem 0 .5rem; }
+  .summary-sentence { font-size:1.1rem; color:var(--text); line-height:1.6; }
+  .summary-sentence strong { color:var(--accent); }
+  .summary-date { font-size:.78rem; color:var(--muted); margin-top:.25rem; }
 
   /* Layout */
   main { max-width:1160px; margin:0 auto; padding:2rem 1.5rem; }
@@ -268,6 +306,10 @@ if ($isLocked) {
   .kpi-label { font-size:.65rem; text-transform:uppercase; letter-spacing:.12em; color:var(--accent); margin-bottom:.5rem; }
   .kpi-value { font-family:var(--font); font-size:1.9rem; font-weight:700; line-height:1; }
   .kpi-sub { font-size:.72rem; color:var(--muted); margin-top:.3rem; }
+  .kpi-delta { font-size:.72rem; margin-top:.3rem; font-weight:500; }
+  .kpi-delta.up   { color:#2d6a4f; }
+  .kpi-delta.down { color:#c0392b; }
+  .kpi-delta.same { color:var(--muted); }
 
   /* Cards */
   .card { background:var(--surface); border:1px solid var(--border); border-radius:14px; padding:1.5rem; margin-bottom:14px; }
@@ -281,11 +323,8 @@ if ($isLocked) {
   .trend-chart { display:flex; align-items:flex-end; gap:3px; height:80px; }
   .bar-col { flex:1; display:flex; flex-direction:column; align-items:center; height:100%; justify-content:flex-end; gap:3px; cursor:default; position:relative; }
   .bar-views { width:100%; background:var(--accent); border-radius:3px 3px 0 0; min-height:2px; opacity:.75; transition:opacity .15s; position:relative; }
-  .bar-uniq  { width:60%; background:var(--accent); border-radius:2px 2px 0 0; min-height:1px; opacity:.35; position:absolute; bottom:0; left:20%; }
   .bar-col:hover .bar-views { opacity:1; }
   .bar-col .lbl { font-size:.52rem; color:var(--muted); }
-  .trend-legend { display:flex; gap:1rem; margin-top:.6rem; }
-  .legend-dot { display:inline-block; width:8px; height:8px; border-radius:2px; margin-right:.3rem; vertical-align:middle; }
 
   /* Hours */
   .hours-chart { display:flex; align-items:flex-end; gap:2px; height:60px; }
@@ -326,9 +365,9 @@ if ($isLocked) {
   tbody tr:last-child td { border-bottom:none; }
   .muted { color:var(--muted); }
   .badge { display:inline-block; padding:.15rem .5rem; border-radius:20px; font-size:.65rem; text-transform:uppercase; letter-spacing:.05em; }
-  .badge-desktop { background:#f5ede4; color:var(--accent); }
-  .badge-mobile  { background:#fdf3e8; color:#b8712e; }
-  .badge-tablet  { background:#fef7ee; color:#c08040; }
+  .badge-desktop { background:rgba(13,148,136,.1); color:var(--accent); }
+  .badge-mobile  { background:rgba(13,148,136,.07); color:var(--accent); }
+  .badge-tablet  { background:rgba(13,148,136,.05); color:var(--accent); }
 
   /* Danger zone */
   .danger-zone { border:1px solid #f5c6c2; border-radius:14px; padding:1.5rem; margin-bottom:14px; background:#fff9f9; }
@@ -358,6 +397,7 @@ if ($isLocked) {
     <?php endif; ?>
     <h1><?= htmlspecialchars($brandName) ?></h1>
     <div class="sub">Analytics Dashboard</div>
+    <div class="tagline">measure more. manage less.</div>
     <form method="POST">
       <input type="password" name="password" placeholder="Password" autofocus autocomplete="current-password" <?= $isLocked ? 'disabled' : '' ?>>
       <button type="submit" <?= $isLocked ? 'disabled' : '' ?>>Login</button>
@@ -380,7 +420,10 @@ if ($isLocked) {
     <?php if ($brandLogo): ?>
       <img src="<?= htmlspecialchars($brandLogo) ?>" alt="<?= htmlspecialchars($brandName) ?>">
     <?php else: ?>
-      <h1><?= htmlspecialchars($brandName) ?></h1>
+      <div>
+        <h1><?= htmlspecialchars($brandName) ?></h1>
+        <div class="header-tagline">measure more. manage less.</div>
+      </div>
     <?php endif; ?>
   </div>
   <span class="header-meta"><?= date('d.m.Y · H:i') ?> · <?= TIMEZONE ?></span>
@@ -401,33 +444,47 @@ if ($isLocked) {
   <div class="card"><div class="empty">No data yet — add the tracking snippet to your site to get started.</div></div>
 <?php else: ?>
 
+<!-- Summary sentence -->
+<?php
+  $weekDiff  = $stats['this_week']  - $stats['last_week'];
+  $monthDiff = $stats['this_month'] - $stats['last_month'];
+  $weekDelta  = $weekDiff  > 0 ? '+' . $weekDiff  : ($weekDiff  < 0 ? (string)$weekDiff  : '—');
+  $monthDelta = $monthDiff > 0 ? '+' . $monthDiff : ($monthDiff < 0 ? (string)$monthDiff : '—');
+  $weekClass  = $weekDiff  > 0 ? 'up' : ($weekDiff  < 0 ? 'down' : 'same');
+  $monthClass = $monthDiff > 0 ? 'up' : ($monthDiff < 0 ? 'down' : 'same');
+?>
+<div class="summary">
+  <div class="summary-sentence">
+    Your site had <strong><?= number_format($stats['this_month']) ?> pageviews</strong> from an estimated <strong><?= number_format($stats['uniq_total']) ?> visitors</strong> this month.
+  </div>
+  <div class="summary-date"><?= date('F Y') ?> · <?= TIMEZONE ?></div>
+</div>
+
 <!-- KPIs -->
 <div class="kpi-row">
   <div class="kpi highlight">
     <div class="kpi-label">Total Views</div>
     <div class="kpi-value"><?= number_format($stats['total']) ?></div>
-  </div>
-  <div class="kpi highlight">
-    <div class="kpi-label">Est. Visitors</div>
-    <div class="kpi-value"><?= number_format($stats['uniq_total']) ?></div>
-    <div class="kpi-sub">approx. unique</div>
+    <div class="kpi-sub">all time</div>
   </div>
   <div class="kpi">
-    <div class="kpi-label">Today Views</div>
+    <div class="kpi-label">Today</div>
     <div class="kpi-value"><?= number_format($stats['today']) ?></div>
+    <div class="kpi-sub"><?= number_format($stats['uniq_today']) ?> est. visitors</div>
   </div>
   <div class="kpi">
-    <div class="kpi-label">Today Visitors</div>
-    <div class="kpi-value"><?= number_format($stats['uniq_today']) ?></div>
-    <div class="kpi-sub">approx. unique</div>
+    <div class="kpi-label">This Week</div>
+    <div class="kpi-value"><?= number_format($stats['this_week']) ?></div>
+    <div class="kpi-delta <?= $weekClass ?>">
+      <?= $weekDelta ?> vs last week
+    </div>
   </div>
   <div class="kpi">
-    <div class="kpi-label">Pages</div>
-    <div class="kpi-value"><?= number_format(count($stats['pages'])) ?></div>
-  </div>
-  <div class="kpi">
-    <div class="kpi-label">Referrers</div>
-    <div class="kpi-value"><?= number_format(count($stats['referrers'])) ?></div>
+    <div class="kpi-label">This Month</div>
+    <div class="kpi-value"><?= number_format($stats['this_month']) ?></div>
+    <div class="kpi-delta <?= $monthClass ?>">
+      <?= $monthDelta ?> vs last month
+    </div>
   </div>
 </div>
 
@@ -437,20 +494,17 @@ if ($isLocked) {
   <div class="trend-chart">
     <?php foreach ($stats['trend'] as $d => $t):
       $hv = $trendMax > 0 ? max(2, round($t['views'] / $trendMax * 100)) : 2;
-      $hu = $t['views'] > 0 ? max(1, round($t['uniq'] / $t['views'] * $hv)) : 0;
     ?>
     <div class="bar-col" title="<?= $d ?>&#10;Views: <?= $t['views'] ?>&#10;Visitors: <?= $t['uniq'] ?>">
-      <div class="bar-views" style="height:<?= $hv ?>%">
-        <div class="bar-uniq" style="height:<?= ($hv > 0 ? round($hu/$hv*100) : 0) ?>%"></div>
+      <div class="bar-views" style="height:<?= $hv ?>%"></div>
+      <div class="lbl">
+        <span style="display:block"><?= date('d', strtotime($d)) ?></span>
+        <span style="display:block;font-size:.45rem;color:var(--muted)"><?= date('M', strtotime($d)) ?></span>
       </div>
-      <div class="lbl"><?= date('d', strtotime($d)) ?></div>
     </div>
     <?php endforeach; ?>
   </div>
-  <div class="trend-legend">
-    <span><span class="legend-dot" style="background:var(--accent);opacity:.75"></span><span style="font-size:.72rem;color:var(--muted)">Pageviews</span></span>
-    <span><span class="legend-dot" style="background:var(--accent);opacity:.35"></span><span style="font-size:.72rem;color:var(--muted)">Est. Visitors</span></span>
-  </div>
+
 </div>
 
 <!-- Pages + Referrers -->
@@ -538,7 +592,7 @@ if ($isLocked) {
       <?php foreach (array_slice($stats['countries'], 0, 7, true) as $co => $c): ?>
         <li>
           <span class="rank-n"><?= $i++ ?></span>
-          <span class="rank-label"><?= htmlspecialchars($co) ?></span>
+          <span class="rank-label"><?= htmlspecialchars(countryName($co, $countryNames)) ?></span>
           <div class="rank-track"><div class="rank-fill" style="width:<?= round($c/$maxC*100) ?>%"></div></div>
           <span class="rank-count"><?= $c ?></span>
         </li>
@@ -552,7 +606,11 @@ if ($isLocked) {
 
 <!-- Recent hits -->
 <div class="card">
-  <h2>Recent <?= RECENT_ENTRIES ?> Hits</h2>
+  <div style="display:flex;align-items:center;justify-content:space-between;padding-bottom:.75rem;border-bottom:1px solid var(--border);margin-bottom:1rem;">
+    <h2 style="border:none;padding:0;margin:0;">Recent <?= RECENT_ENTRIES ?> Hits</h2>
+    <button onclick="var t=document.getElementById('recent-tbl');var b=this;t.style.display=t.style.display==='none'?'block':'none';b.textContent=t.style.display==='none'?'Show ↓':'Hide ↑';" style="background:none;border:1px solid var(--border);border-radius:8px;padding:.3rem .75rem;font-size:.78rem;color:var(--muted);cursor:pointer;">Show ↓</button>
+  </div>
+  <div id="recent-tbl" style="display:none;">
   <div class="tbl-wrap">
     <table>
       <thead>
@@ -566,11 +624,12 @@ if ($isLocked) {
           <td><?= htmlspecialchars($r['page']) ?></td>
           <td class="muted"><?= !empty($r['referrer']) ? htmlspecialchars(preg_replace('/^www\./', '', parse_url($r['referrer'], PHP_URL_HOST) ?: $r['referrer'])) : '—' ?></td>
           <td><span class="badge badge-<?= htmlspecialchars($r['device'] ?: 'desktop') ?>"><?= htmlspecialchars($r['device'] ?: 'desktop') ?></span></td>
-          <td><?= htmlspecialchars($r['country'] ?: '—') ?></td>
+          <td><?= htmlspecialchars($r['country'] ? countryName($r['country'], $countryNames) : '—') ?></td>
         </tr>
         <?php endforeach; ?>
       </tbody>
     </table>
+  </div>
   </div>
   <p class="file-info">analytics.db · <?= $stats['db_size'] ?> KB · <?= number_format($stats['db_rows']) ?> rows</p>
 </div>
