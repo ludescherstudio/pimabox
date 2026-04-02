@@ -52,25 +52,25 @@ your-webroot/
 > Disallow: /cache/
 > ```
 
-### Step 2 — Set your password and token
+### Step 2 — Set your passwords
 
-Open `config.php` and set a strong password and a secret tracker token:
+Open `config.php` and set two things:
 
 ```php
-define('STATS_PASSWORD', 'your-secure-password');
-define('TRACKER_TOKEN',  'some-random-secret-string');
+define('STATS_PASSWORD', 'your-dashboard-password');  // to log into your dashboard
+define('TRACKER_TOKEN',  'my-secret-word');            // a second password for the snippet below
 define('TIMEZONE',       'Europe/Vienna');
 ```
 
 ### Step 3 — Add the tracking snippet
 
-Paste this before `</body>` on every page you want to track. Replace `YOUR_TOKEN` with the value you set in `config.php`:
+Paste this before `</body>` on every page you want to track — and replace `my-secret-word` with whatever you chose above:
 
 ```html
 <script>
 fetch('/tracker.php?p=' + encodeURIComponent(location.pathname)
   + '&r=' + encodeURIComponent(document.referrer)
-  + '&t=YOUR_TOKEN');
+  + '&t=my-secret-word');
 </script>
 ```
 
