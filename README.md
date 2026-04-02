@@ -125,10 +125,10 @@ pimabox is designed to be reasonably secure out of the box for a self-hosted too
 
 **What's protected:**
 - `config.php` is blocked from web access via `.htaccess` — no one can read your password from the browser
-- `cache/` is fully blocked — the CSV file cannot be downloaded directly
+- `cache/` is fully blocked — the SQLite database cannot be downloaded directly
 - The login form has **brute-force protection**: after 5 failed attempts, the form locks out for 15 minutes (configurable in `config.php`)
 - After a successful login, the session ID is regenerated to prevent session fixation attacks
-- All inputs to `tracker.php` are sanitized against CSV injection and formula injection
+- All inputs to `tracker.php` are safely bound using PDO prepared statements to prevent SQL injection
 - The **tracker token** (`TRACKER_TOKEN`) ensures only your own snippet can write hits — preventing fake data from being injected
 
 **robots.txt** excludes `/stats`, `/tracker.php`, and `/cache/` from being indexed or crawled by search engines and bots.
@@ -210,7 +210,7 @@ define('TREND_DAYS',        14);                 // Days shown in trend chart
 
 - **Pageviews, not unique visitors** — without cookies or fingerprinting, sessions can't be tracked. This is intentional.
 - **Not for high-traffic sites** — SQLite handles millions of rows comfortably, but concurrent write spikes (500+ simultaneous visitors) may cause brief delays.
-- **No real-time view** — dashboard reflects data as written to CSV.
+- **No real-time view** — dashboard reflects data as written to the database.
 
 ---
 
@@ -219,7 +219,7 @@ define('TREND_DAYS',        14);                 // Days shown in trend chart
 - PHP 7.4+
 - Apache with `.htaccess` support (standard on all shared hosts)
 - `fopen` / `fwrite` enabled (standard)
-- SQLite3 extension enabled (standard on all major hosts)
+- SQLite3 and PDO_SQLITE extensions enabled (standard on all major hosts)
 - `allow_url_fopen` (only for country detection)
 - HTTPS (strongly recommended)
 
