@@ -141,6 +141,7 @@ define('LOCKOUT_SECONDS',    900);  // Lockout duration (900 = 15 minutes)
 - **Device split** — Desktop / Mobile / Tablet
 - **Countries** — Top countries
 - **Recent hits** — Last 50 page views
+- **CSV Export** — Download all your data anytime
 
 ---
 
@@ -159,7 +160,7 @@ define('BRAND_NAME',        'My Site');          // Site name in header
 define('BRAND_FONT',        'Georgia, serif');   // Font stack
 define('BRAND_FONT_URL',    '');                 // Google Fonts URL
 
-define('CSV_MAX_SIZE_MB',   10);                 // Auto-rotate log above this size
+define('DB_PATH',           __DIR__.'/cache/analytics.db'); // SQLite database path
 define('GEO_ENABLED',       true);               // Country lookup via ip-api.com
 define('EXCLUDED_IPS',      ['1.2.3.4']);        // Your own IPs to ignore
 define('MAX_LOGIN_ATTEMPTS',5);                  // Attempts before lockout
@@ -183,7 +184,7 @@ define('TREND_DAYS',        14);                 // Days shown in trend chart
 ## Honest limitations
 
 - **Pageviews, not unique visitors** — without cookies or fingerprinting, sessions can't be tracked. This is intentional.
-- **Not for high-traffic sites** — CSV works well up to ~5,000 pageviews/day. Beyond that, consider a database-backed solution.
+- **Not for high-traffic sites** — SQLite handles millions of rows comfortably, but concurrent write spikes (500+ simultaneous visitors) may cause brief delays.
 - **No real-time view** — dashboard reflects data as written to CSV.
 
 ---
@@ -193,6 +194,7 @@ define('TREND_DAYS',        14);                 // Days shown in trend chart
 - PHP 7.4+
 - Apache with `.htaccess` support (standard on all shared hosts)
 - `fopen` / `fwrite` enabled (standard)
+- SQLite3 extension enabled (standard on all major hosts)
 - `allow_url_fopen` (only for country detection)
 - HTTPS (strongly recommended)
 
