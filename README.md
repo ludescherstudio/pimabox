@@ -131,7 +131,7 @@ pimabox is designed to be reasonably secure out of the box for a self-hosted too
 - All inputs to `tracker.php` are safely bound using PDO prepared statements to prevent SQL injection
 - The **tracker token** (`TRACKER_TOKEN`) ensures only your own snippet can write hits — preventing fake data from being injected
 
-**robots.txt** excludes `/stats`, `/tracker.php`, and `/cache/` from being indexed or crawled by search engines and bots.
+**robots.txt** excludes `/pimabox`, `/tracker.php`, and `/cache/` from being indexed or crawled by search engines and bots.
 
 **Important:** pimabox should only be used on sites with HTTPS. The login password is sent via POST — over plain HTTP it would be visible in transit. Most shared hosts (including World4You) provide free SSL — make sure it's active.
 
@@ -160,13 +160,17 @@ define('LOCKOUT_SECONDS',    900);  // Lockout duration (900 = 15 minutes)
 
 ## Dashboard
 
-- **KPIs** — Total pageviews, today, unique pages, referrers, countries
+- **Summary** — Monthly pageviews and estimated visitors at a glance
+- **KPIs** — Total views, today, this week, this month (with week/month deltas)
 - **14-day trend** — Daily bar chart
-- **Top pages** — Ranked with visual bars
+- **Top pages** — Ranked with week-over-week delta
 - **Referrers** — Where your visitors come from
+- **Entry pages** — First pages seen by visitors arriving from external sources
+- **Browser language** — Language distribution of your visitors
+- **Time of day** — When your visitors are most active
 - **Device split** — Desktop / Mobile / Tablet
 - **Countries** — Top countries
-- **Recent hits** — Last 50 page views
+- **Recent hits** — Last 50 page views (collapsed by default)
 - **CSV Export** — Download all your data anytime
 
 ---
@@ -176,21 +180,21 @@ define('LOCKOUT_SECONDS',    900);  // Lockout duration (900 = 15 minutes)
 All settings in `config.php`:
 
 ```php
-define('STATS_PASSWORD',    'change-me');       // Dashboard password
-define('TRACKER_TOKEN',     'change-me');        // Secret for tracking snippet
-define('TIMEZONE',          'Europe/Vienna');    // PHP timezone string
+define('STATS_PASSWORD',    'change-me');                        // Dashboard password
+define('TRACKER_TOKEN',     'my-secret-word');                   // Second password for tracking snippet
+define('TIMEZONE',          'Europe/Vienna');                     // php.net/timezones
 
-define('BRAND_COLOR',       '#c4773a');          // Dashboard accent color
-define('BRAND_LOGO',        '');                 // Path/URL to logo image
-define('BRAND_NAME',        'My Site');          // Site name in header
-
-define('DB_PATH',           __DIR__.'/cache/analytics.db'); // SQLite database path
-define('GEO_ENABLED',       true);               // Country lookup via ip-api.com
-define('EXCLUDED_IPS',      ['1.2.3.4']);        // Your own IPs to ignore
-define('MAX_LOGIN_ATTEMPTS',5);                  // Attempts before lockout
-define('LOCKOUT_SECONDS',   900);                // Lockout duration in seconds
-define('RECENT_ENTRIES',    50);                 // Rows in recent hits table
-define('TREND_DAYS',        14);                 // Days shown in trend chart
+define('BRAND_COLOR',       '#0d9488');                          // Any CSS hex color
+define('BRAND_NAME',        'pimabox');                          // Shown in header and browser tab
+define('BRAND_LOGO',        '');                                 // Path to self-hosted logo image
+define('DB_PATH',           __DIR__.'/cache/analytics.db');      // SQLite database location
+define('GEO_ENABLED',       true);                               // Country lookup via ip-api.com
+define('EXCLUDED_IPS',      []);                                 // Your own IPs to ignore
+define('MAX_LOGIN_ATTEMPTS',5);                                  // Failed attempts before lockout
+define('LOCKOUT_SECONDS',   900);                                // Lockout duration (900 = 15 min)
+define('RECENT_ENTRIES',    50);                                 // Rows in recent hits table
+define('TREND_DAYS',        14);                                 // Days shown in trend chart
+define('ADVANCED_MODE',     false);                              // Enable danger zone in dashboard
 ```
 
 ---
@@ -202,6 +206,24 @@ define('TREND_DAYS',        14);                 // Days shown in trend chart
 - Only the country code (e.g. `AT`) is stored, not the IP
 - All data stays on your own server
 - For zero external requests: set `GEO_ENABLED = false`
+
+---
+
+## Advanced Mode
+
+For power users who want extra control. Disabled by default — won't appear for regular users.
+
+Enable it in `config.php`:
+
+```php
+define('ADVANCED_MODE', true);
+```
+
+This adds a **Danger Zone** section at the bottom of the dashboard with:
+- Database info (file size, row count)
+- **Clear all data** — permanently deletes all analytics rows (requires confirmation)
+
+Disable again by setting it back to `false`.
 
 ---
 
