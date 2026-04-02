@@ -71,7 +71,7 @@ define('TIMEZONE',       'Europe/Vienna'); // full list: php.net/timezones
 
 ### Step 3 — Add the tracking snippet
 
-Paste this before `</body>` on **every page** you want to track — homepage, about, contact, imprint, blog posts, everything. Replace `my-secret-word` with whatever you chose above:
+Paste this on **every page** you want to track — homepage, about, contact, imprint, blog posts, everything. It goes at the very end of your HTML, after your footer, directly before the closing `</body>` tag. If you're not sure where that is, search for `</body>` in your HTML file — there's only one. Replace `my-secret-word` with whatever you chose above:
 
 ```html
 <script>
