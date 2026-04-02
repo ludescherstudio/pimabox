@@ -15,10 +15,10 @@ define('TRACKER_TOKEN', 'my-secret-word');
 define('TIMEZONE', 'Europe/Vienna'); // full list: php.net/timezones
 
 // --- Branding ---
-define('BRAND_COLOR',    '#c4773a');
+define('BRAND_COLOR',    '#3b82f6');
 define('BRAND_LOGO',     '');                // e.g. '/assets/logo.svg'
-define('BRAND_NAME',     'My Site');
-define('BRAND_FONT',     'Georgia, serif');
+define('BRAND_NAME',     'pimabox');
+define('BRAND_FONT',     'system-ui, -apple-system, sans-serif');
 define('BRAND_FONT_URL', '');                // e.g. 'https://fonts.googleapis.com/css2?family=Lato'
 
 // --- Database ---
