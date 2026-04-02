@@ -1,7 +1,7 @@
 <?php
 // ============================================================
 // pimabox — tracker.php
-// Receives page view pings, filters bots, logs to CSV.
+// Receives page view pings, filters bots, logs to SQLite.
 // No cookies. No IP storage. GDPR-friendly.
 // ============================================================
 
@@ -50,21 +50,12 @@ function getCountry(string $ip): string {
     return '';
 }
 
-/**
- * Privacy-safe visitor hash.
- * Combines date + truncated IP (first 3 octets only) + UA + daily salt.
- * The salt rotates daily → hash cannot be linked across days.
- * IP is never stored — only used transiently to compute the hash.
- */
 function visitorHash(string $ip, string $ua, string $date): string {
-    // Use only first 3 octets of IPv4 (masks last octet) — /24 anonymization
-    $ipAnon = preg_replace('/\.\d+$/', '.0', $ip);
-    // Daily salt stored in cache dir — rotates automatically each day
-    $saltFile = dirname(CSV_PATH) . '/.salt_' . $date;
+    $ipAnon   = preg_replace('/\.\d+$/', '.0', $ip);
+    $saltFile = dirname(DB_PATH) . '/.salt_' . $date;
     if (!file_exists($saltFile)) {
         file_put_contents($saltFile, bin2hex(random_bytes(16)));
-        // Clean up old salt files (keep only last 2 days)
-        foreach (glob(dirname(CSV_PATH) . '/.salt_*') as $f) {
+        foreach (glob(dirname(DB_PATH) . '/.salt_*') as $f) {
             if ($f !== $saltFile && filemtime($f) < strtotime('-2 days')) @unlink($f);
         }
     }
@@ -78,17 +69,28 @@ function sanitize(string $val, int $maxLen = 512): string {
     return mb_substr(trim($val), 0, $maxLen);
 }
 
-function rotateCsvIfNeeded(string $csvPath): void {
-    if (!file_exists($csvPath)) return;
-    if (filesize($csvPath) / 1048576 >= CSV_MAX_SIZE_MB) {
-        $backup = $csvPath . '.' . date('Ymd-His') . CSV_BACKUP_SUFFIX;
-        rename($csvPath, $backup);
-        $backups = glob(dirname($csvPath) . '/' . basename($csvPath) . '.*.bak');
-        if ($backups && count($backups) > 3) {
-            sort($backups);
-            foreach (array_slice($backups, 0, count($backups) - 3) as $old) @unlink($old);
-        }
-    }
+function initDb(): SQLite3 {
+    $cacheDir = dirname(DB_PATH);
+    if (!is_dir($cacheDir)) mkdir($cacheDir, 0750, true);
+    $db = new SQLite3(DB_PATH);
+    $db->enableExceptions(true);
+    $db->exec('PRAGMA journal_mode=WAL');  // better concurrent write handling
+    $db->exec('PRAGMA synchronous=NORMAL');
+    $db->exec('CREATE TABLE IF NOT EXISTS hits (
+        id       INTEGER PRIMARY KEY AUTOINCREMENT,
+        date     TEXT NOT NULL,
+        time     TEXT NOT NULL,
+        page     TEXT NOT NULL,
+        referrer TEXT,
+        device   TEXT,
+        country  TEXT,
+        vid      TEXT
+    )');
+    $db->exec('CREATE INDEX IF NOT EXISTS idx_date    ON hits(date)');
+    $db->exec('CREATE INDEX IF NOT EXISTS idx_page    ON hits(page)');
+    $db->exec('CREATE INDEX IF NOT EXISTS idx_country ON hits(country)');
+    $db->exec('CREATE INDEX IF NOT EXISTS idx_vid     ON hits(vid)');
+    return $db;
 }
 
 // ---- Main ----
@@ -111,26 +113,20 @@ $device  = getDevice($ua);
 $country = getCountry($ip);
 $date    = date('Y-m-d');
 $time    = date('H:i:s');
-$vid     = visitorHash($ip, $ua, $date); // privacy-safe daily visitor token
+$vid     = visitorHash($ip, $ua, $date);
 
-$csvPath  = CSV_PATH;
-$cacheDir = dirname($csvPath);
-if (!is_dir($cacheDir)) mkdir($cacheDir, 0750, true);
-
-rotateCsvIfNeeded($csvPath);
-
-$needsHeader = !file_exists($csvPath) || filesize($csvPath) === 0;
-$row = implode(',', [
-    $date, $time,
-    '"' . str_replace('"', '""', $page) . '"',
-    '"' . str_replace('"', '""', $referrer) . '"',
-    $device, $country, $vid,
-]);
-
-$fh = fopen($csvPath, 'a');
-if ($fh && flock($fh, LOCK_EX)) {
-    if ($needsHeader) fwrite($fh, "date,time,page,referrer,device,country,vid\n");
-    fwrite($fh, $row . "\n");
-    flock($fh, LOCK_UN);
-    fclose($fh);
+try {
+    $db   = initDb();
+    $stmt = $db->prepare('INSERT INTO hits (date, time, page, referrer, device, country, vid) VALUES (:date, :time, :page, :referrer, :device, :country, :vid)');
+    $stmt->bindValue(':date',     $date);
+    $stmt->bindValue(':time',     $time);
+    $stmt->bindValue(':page',     $page);
+    $stmt->bindValue(':referrer', $referrer);
+    $stmt->bindValue(':device',   $device);
+    $stmt->bindValue(':country',  $country);
+    $stmt->bindValue(':vid',      $vid);
+    $stmt->execute();
+    $db->close();
+} catch (Exception $e) {
+    // Fail silently — never break the tracked page
 }
