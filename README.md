@@ -9,6 +9,8 @@
 No Node.js. No Docker. No database. No cookies. No consent banner.  
 Just upload 5 files and you're done.
 
+Designed for beginners — if you can upload files via FTP and edit a text file, you can run pimabox. Works on any website: static HTML, WordPress, or any PHP-based site.
+
 ---
 
 ## Why pimabox?
@@ -19,7 +21,7 @@ Just upload 5 files and you're done.
 | No database | ✅ | ❌ | ❌ | — |
 | Shared hosting | ✅ | ⚠️ | ❌ | — |
 | Self-hosted | ✅ | ✅ | ✅ | ❌ |
-| Install time | 2 min | 30 min | 1–2h | 5 min |
+| Install time | ~5 min | 30 min | 1–2h | 5 min |
 
 ---
 
