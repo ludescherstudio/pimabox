@@ -15,23 +15,23 @@ define('TRACKER_TOKEN', 'my-secret-word');
 define('TIMEZONE', 'Europe/Vienna'); // full list: php.net/timezones
 
 // --- Branding ---
-define('BRAND_COLOR',    '#3b82f6');
+define('BRAND_COLOR',    '#0d9488');
 define('BRAND_LOGO',     '');                // e.g. '/assets/logo.svg'
 define('BRAND_NAME',     'pimabox');
 
 // --- Database ---
 define('DB_PATH', __DIR__ . '/cache/analytics.db');
- 
+
 // --- IP Geolocation (optional) ---
 // Uses ip-api.com (free, no key needed, rate-limited to 45 req/min)
 // Set to false to disable country detection entirely
 define('GEO_ENABLED', true);
- 
+
 // --- IPs to exclude from tracking ---
 define('EXCLUDED_IPS', [
     // '1.2.3.4',
 ]);
- 
+
 // --- Bot filter ---
 define('BOT_PATTERNS', [
     'bot', 'crawl', 'spider', 'slurp', 'wget', 'curl',
@@ -43,15 +43,15 @@ define('BOT_PATTERNS', [
     'petalbot', 'bytespider', 'gptbot', 'claudebot',
     'anthropic-ai', 'ccbot', 'dataforseobot',
 ]);
- 
+
 // --- Dashboard display settings ---
 define('RECENT_ENTRIES', 50);
 define('TREND_DAYS', 14);
- 
+
 // --- Brute-force protection ---
 define('MAX_LOGIN_ATTEMPTS', 5);
 define('LOCKOUT_SECONDS', 900); // 15 minutes
- 
+
 // --- Advanced ---
 // Set to true to enable the Danger Zone in the dashboard (clear all data, DB info)
 define('ADVANCED_MODE', false);
