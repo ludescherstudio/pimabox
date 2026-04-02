@@ -643,7 +643,7 @@ if ($isLocked) {
       </tbody>
     </table>
   </div>
-  <p class="file-info">analytics.db · <?= $stats['db_size'] ?> KB · <?= number_format($stats['db_rows']) ?> rows · powered by <a href="https://github.com/yourname/pimabox" style="color:var(--muted)">pimabox</a></p>
+  <p class="file-info">analytics.db · <?= $stats['db_size'] ?> KB · <?= number_format($stats['db_rows']) ?> rows · powered by <a href="https://github.com/ludescherstudio/pimabox" style="color:var(--muted)">pimabox</a></p>
 </div>
 
 <?php endif; // total > 0 ?>
