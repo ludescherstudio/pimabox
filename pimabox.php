@@ -421,13 +421,7 @@ if ($isLocked) {
     <div class="header-pimabox-name">pimabox</div>
     <div class="header-tagline">measure more. manage less.</div>
   </div>
-  <div class="header-brand">
-    <?php if ($brandLogo): ?>
-      <img src="<?= htmlspecialchars($brandLogo) ?>" alt="<?= htmlspecialchars($brandName) ?>">
-    <?php else: ?>
-      <span class="header-site-name"><?= htmlspecialchars($brandName) ?></span>
-    <?php endif; ?>
-  </div>
+
   <div class="header-actions">
     <a href="?export=1" class="btn-export">↓ Export CSV</a>
     <a href="?" class="btn-ghost">Refresh</a>
@@ -454,6 +448,15 @@ if ($isLocked) {
   $weekClass  = $weekDiff  > 0 ? 'up' : ($weekDiff  < 0 ? 'down' : 'same');
   $monthClass = $monthDiff > 0 ? 'up' : ($monthDiff < 0 ? 'down' : 'same');
 ?>
+<?php if ($brandLogo || (!empty($brandName) && $brandName !== 'pimabox')): ?>
+<div style="text-align:center;padding:1.5rem 0 .5rem;margin-bottom:1rem;">
+  <?php if ($brandLogo): ?>
+    <img src="<?= htmlspecialchars($brandLogo) ?>" alt="<?= htmlspecialchars($brandName) ?>" style="max-height:48px;max-width:200px;">
+  <?php else: ?>
+    <span style="font-size:1.1rem;font-weight:600;color:var(--text);"><?= htmlspecialchars($brandName) ?></span>
+  <?php endif; ?>
+</div>
+<?php endif; ?>
 <div class="summary">
   <div class="summary-sentence">
     Your site had <strong><?= number_format($stats['this_month']) ?> pageviews</strong> from an estimated <strong><?= number_format($stats['uniq_total']) ?> visitors</strong> this month.
