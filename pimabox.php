@@ -279,11 +279,12 @@ if ($isLocked) {
 
   /* Header */
   header { background:#0d2d2b; border-bottom:1px solid #1a4a47; padding:1rem 1.5rem; display:flex; align-items:center; justify-content:space-between; gap:1rem; flex-wrap:wrap; }
-  .header-brand { display:flex; align-items:center; gap:.75rem; }
-  .header-brand img { max-height:28px; max-width:120px; }
-  .header-brand h1 { font-family:var(--font); font-size:1.2rem; font-weight:700; color:#fff; }
-  .header-tagline { font-size:.68rem; color:#5eada8; letter-spacing:.04em; margin-top:.1rem; }
-  .header-meta { font-size:.75rem; color:#5eada8; }
+  .header-pimabox { display:flex; flex-direction:column; justify-content:center; }
+  .header-pimabox-name { font-size:1rem; font-weight:700; color:#fff; letter-spacing:.02em; }
+  .header-tagline { font-size:.65rem; color:#5eada8; letter-spacing:.04em; margin-top:.1rem; }
+  .header-brand { display:flex; align-items:center; }
+  .header-brand img { max-height:28px; max-width:160px; }
+  .header-site-name { font-size:.95rem; font-weight:500; color:rgba(255,255,255,.7); }
   .header-actions { display:flex; align-items:center; gap:.75rem; flex-wrap:wrap; }
   .btn-ghost { background:none; border:1px solid #1a4a47; border-radius:8px; padding:.3rem .75rem; font-size:.78rem; color:#5eada8; cursor:pointer; transition:all .15s; text-decoration:none; display:inline-block; }
   .btn-ghost:hover { border-color:#fff; color:#fff; }
@@ -416,17 +417,17 @@ if ($isLocked) {
 <?php else: ?>
 
 <header>
+  <div class="header-pimabox">
+    <div class="header-pimabox-name">pimabox</div>
+    <div class="header-tagline">measure more. manage less.</div>
+  </div>
   <div class="header-brand">
     <?php if ($brandLogo): ?>
       <img src="<?= htmlspecialchars($brandLogo) ?>" alt="<?= htmlspecialchars($brandName) ?>">
     <?php else: ?>
-      <div>
-        <h1><?= htmlspecialchars($brandName) ?></h1>
-        <div class="header-tagline">measure more. manage less.</div>
-      </div>
+      <span class="header-site-name"><?= htmlspecialchars($brandName) ?></span>
     <?php endif; ?>
   </div>
-  <span class="header-meta"><?= date('d.m.Y · H:i') ?> · <?= TIMEZONE ?></span>
   <div class="header-actions">
     <a href="?export=1" class="btn-export">↓ Export CSV</a>
     <a href="?" class="btn-ghost">Refresh</a>
@@ -457,7 +458,7 @@ if ($isLocked) {
   <div class="summary-sentence">
     Your site had <strong><?= number_format($stats['this_month']) ?> pageviews</strong> from an estimated <strong><?= number_format($stats['uniq_total']) ?> visitors</strong> this month.
   </div>
-  <div class="summary-date"><?= date('F Y') ?> · <?= TIMEZONE ?></div>
+  <div class="summary-date"><?= date('d. F Y') ?> · <?= TIMEZONE ?></div>
 </div>
 
 <!-- KPIs -->
