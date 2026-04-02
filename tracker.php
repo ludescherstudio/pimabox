@@ -63,6 +63,13 @@ function visitorHash(string $ip, string $ua, string $date): string {
     return substr(hash('sha256', $salt . $date . $ipAnon . $ua), 0, 12);
 }
 
+function parseLang(string $raw): string {
+    // Extract primary language from Accept-Language header e.g. "de-AT,de;q=0.9,en;q=0.8" → "de"
+    if (empty($raw)) return '';
+    preg_match('/^([a-zA-Z]{2,3})/', trim($raw), $m);
+    return strtolower($m[1] ?? '');
+}
+
 function sanitize(string $val, int $maxLen = 512): string {
     $val = str_replace(["\r", "\n", "\t"], ' ', $val);
     $val = ltrim($val, '=+-@');
@@ -84,8 +91,11 @@ function initDb(): SQLite3 {
         referrer TEXT,
         device   TEXT,
         country  TEXT,
-        vid      TEXT
+        vid      TEXT,
+        lang     TEXT
     )');
+    // Add lang column if upgrading from older version
+    try { $db->exec('ALTER TABLE hits ADD COLUMN lang TEXT'); } catch (Exception $e) {}
     $db->exec('CREATE INDEX IF NOT EXISTS idx_date    ON hits(date)');
     $db->exec('CREATE INDEX IF NOT EXISTS idx_page    ON hits(page)');
     $db->exec('CREATE INDEX IF NOT EXISTS idx_country ON hits(country)');
@@ -119,10 +129,11 @@ $country = getCountry($ip);
 $date    = date('Y-m-d');
 $time    = date('H:i:s');
 $vid     = visitorHash($ip, $ua, $date);
+$lang    = parseLang($_SERVER['HTTP_ACCEPT_LANGUAGE'] ?? '');
 
 try {
     $db   = initDb();
-    $stmt = $db->prepare('INSERT INTO hits (date, time, page, referrer, device, country, vid) VALUES (:date, :time, :page, :referrer, :device, :country, :vid)');
+    $stmt = $db->prepare('INSERT INTO hits (date, time, page, referrer, device, country, vid, lang) VALUES (:date, :time, :page, :referrer, :device, :country, :vid, :lang)');
     $stmt->bindValue(':date',     $date);
     $stmt->bindValue(':time',     $time);
     $stmt->bindValue(':page',     $page);
@@ -130,6 +141,7 @@ try {
     $stmt->bindValue(':device',   $device);
     $stmt->bindValue(':country',  $country);
     $stmt->bindValue(':vid',      $vid);
+    $stmt->bindValue(':lang',     $lang);
     $stmt->execute();
     $db->close();
 } catch (Exception $e) {
