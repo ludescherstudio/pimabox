@@ -64,6 +64,11 @@ define('TRACKER_TOKEN',  'my-secret-word');            // a second password for 
 define('TIMEZONE',       'Europe/Vienna'); // full list: php.net/timezones
 ```
 
+> **Why two passwords?**  
+> The tracker token appears in your page's HTML source code — anyone can see it. It only allows *writing* hits, not reading your dashboard. Your dashboard password stays completely secret and is never exposed in your code.
+>
+> **Important:** Use a different value for the tracker token than any of your existing passwords — since it's visible in your source code, treat it as a public identifier, not a secret.
+
 ### Step 3 — Add the tracking snippet
 
 Paste this before `</body>` on **every page** you want to track — homepage, about, contact, imprint, blog posts, everything. Replace `my-secret-word` with whatever you chose above:
