@@ -44,12 +44,12 @@ your-webroot/
 
 > **Already have a `.htaccess`?** Don't overwrite it. Just add this one line:
 > ```apache
-> RewriteRule ^stats$ stats.php [L]
+> RewriteRule ^pimabox$ stats.php [L]
 > ```
 
 > **Already have a `robots.txt`?** Add these lines to it instead:
 > ```
-> Disallow: /stats
+> Disallow: /pimabox
 > Disallow: /tracker.php
 > Disallow: /cache/
 > ```
@@ -83,7 +83,7 @@ fetch('/tracker.php?p=' + encodeURIComponent(location.pathname)
 
 ### Done.
 
-Open `yourdomain.com/stats` in your browser, enter your password, and see your dashboard.
+Open `yourdomain.com/pimabox` in your browser, enter your password, and see your dashboard.
 
 ### Step 4 — Make it yours (optional)
 
