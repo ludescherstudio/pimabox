@@ -132,20 +132,20 @@ if ($authed) {
         $stats['this_month'] = (int) $db->querySingle("SELECT COUNT(*) FROM hits WHERE date >= '$monthStart'");
         $stats['last_month'] = (int) $db->querySingle("SELECT COUNT(*) FROM hits WHERE date >= '$lastMStart' AND date <= '$lastMEnd'");
 
-        // Top pages
-        $res = $db->query("SELECT page, COUNT(*) as c FROM hits GROUP BY page ORDER BY c DESC LIMIT 10");
+        // Top pages (this month)
+        $res = $db->query("SELECT page, COUNT(*) as c FROM hits WHERE date >= '$monthStart' GROUP BY page ORDER BY c DESC LIMIT 8");
         while ($row = $res->fetchArray(SQLITE3_ASSOC)) {
             $stats['pages'][$row['page']] = $row['c'];
         }
 
-        // Top pages prev week
-        $res = $db->query("SELECT page, COUNT(*) as c FROM hits WHERE date >= '$prevStart' AND date <= '$prevEnd' GROUP BY page ORDER BY c DESC");
+        // Top pages prev month
+        $res = $db->query("SELECT page, COUNT(*) as c FROM hits WHERE date >= '$lastMStart' AND date <= '$lastMEnd' GROUP BY page ORDER BY c DESC LIMIT 8");
         while ($row = $res->fetchArray(SQLITE3_ASSOC)) {
             $stats['pages_prev'][$row['page']] = $row['c'];
         }
 
         // Referrers
-        $res = $db->query("SELECT referrer, COUNT(*) as c FROM hits WHERE referrer != '' GROUP BY referrer ORDER BY c DESC LIMIT 10");
+        $res = $db->query("SELECT referrer, COUNT(*) as c FROM hits WHERE referrer != '' GROUP BY referrer ORDER BY c DESC LIMIT 8");
         while ($row = $res->fetchArray(SQLITE3_ASSOC)) {
             $ref = preg_replace('/^www\./', '', parse_url($row['referrer'], PHP_URL_HOST) ?: $row['referrer']);
             $stats['referrers'][$ref] = ($stats['referrers'][$ref] ?? 0) + $row['c'];
@@ -160,7 +160,7 @@ if ($authed) {
         }
 
         // Countries
-        $res = $db->query("SELECT country, COUNT(*) as c FROM hits WHERE country != '' GROUP BY country ORDER BY c DESC LIMIT 20");
+        $res = $db->query("SELECT country, COUNT(*) as c FROM hits WHERE country != '' GROUP BY country ORDER BY c DESC LIMIT 8");
         while ($row = $res->fetchArray(SQLITE3_ASSOC)) {
             $stats['countries'][$row['country']] = $row['c'];
         }
@@ -187,7 +187,7 @@ if ($authed) {
         }
 
         // Browser languages
-        $res = $db->query("SELECT lang, COUNT(*) as c FROM hits WHERE lang IS NOT NULL AND lang != '' GROUP BY lang ORDER BY c DESC LIMIT 10");
+        $res = $db->query("SELECT lang, COUNT(*) as c FROM hits WHERE lang IS NOT NULL AND lang != '' GROUP BY lang ORDER BY c DESC LIMIT 8");
         if ($res) {
             while ($row = $res->fetchArray(SQLITE3_ASSOC)) {
                 $stats['languages'][$row['lang']] = $row['c'];
@@ -196,7 +196,7 @@ if ($authed) {
 
         // Entry pages (hits where referrer is external)
         $currentHost = SQLite3::escapeString($_SERVER['HTTP_HOST'] ?? '');
-        $res = $db->query("SELECT page, COUNT(*) as c FROM hits WHERE referrer != '' AND referrer NOT LIKE '%{$currentHost}%' GROUP BY page ORDER BY c DESC LIMIT 10");
+        $res = $db->query("SELECT page, COUNT(*) as c FROM hits WHERE referrer != '' AND referrer NOT LIKE '%{$currentHost}%' GROUP BY page ORDER BY c DESC LIMIT 8");
         if ($res) {
             while ($row = $res->fetchArray(SQLITE3_ASSOC)) {
                 $stats['entry_pages'][$row['page']] = $row['c'];
@@ -461,7 +461,7 @@ if ($isLocked) {
 <?php if ($brandLogo || (!empty($brandName) && $brandName !== 'pimabox')): ?>
 <div style="text-align:center;padding:1.5rem 0 .5rem;margin-bottom:1rem;">
   <?php if ($brandLogo): ?>
-    <img src="<?= htmlspecialchars($brandLogo) ?>" alt="<?= htmlspecialchars($brandName) ?>" style="max-height:48px;max-width:200px;">
+    <img src="<?= htmlspecialchars($brandLogo) ?>" alt="<?= htmlspecialchars($brandName) ?>" style="max-height:80px;max-width:320px;">
   <?php else: ?>
     <span style="font-size:1.1rem;font-weight:600;color:var(--text);"><?= htmlspecialchars($brandName) ?></span>
   <?php endif; ?>
@@ -479,12 +479,12 @@ if ($isLocked) {
   <div class="kpi highlight">
     <div class="kpi-label">Total Views</div>
     <div class="kpi-value"><?= number_format($stats['total']) ?></div>
-    <div class="kpi-sub">all time</div>
+    <div style="font-size:.82rem;color:var(--accent);opacity:.7;margin-top:.3rem;font-weight:500;"><?= number_format($stats['uniq_total']) ?> visitors</div>
   </div>
   <div class="kpi">
     <div class="kpi-label">Today</div>
     <div class="kpi-value"><?= number_format($stats['today']) ?></div>
-    <div class="kpi-sub"><?= number_format($stats['uniq_today']) ?> est. visitors</div>
+    <div style="font-size:.82rem;color:var(--accent);opacity:.7;margin-top:.3rem;font-weight:500;"><?= number_format($stats['uniq_today']) ?> visitors</div>
   </div>
   <div class="kpi">
     <div class="kpi-label">This Week</div>
@@ -517,7 +517,7 @@ if ($isLocked) {
 
 <div class="grid-2">
   <div class="card">
-    <h2>Top Pages</h2>
+    <h2>Top Pages <span style="font-size:.72rem;font-weight:400;color:var(--muted);">this month</span></h2>
     <?php if (empty($stats['pages'])): ?>
       <p class="no-data">No data yet</p>
     <?php else:
@@ -538,7 +538,7 @@ if ($isLocked) {
         </li>
       <?php endforeach; ?>
       </ul>
-      <p class="section-note">Delta = this week vs. last week</p>
+      <p class="section-note">This month · change vs. last month</p>
     <?php endif; ?>
   </div>
 
@@ -636,7 +636,7 @@ if ($isLocked) {
     <?php else:
       $maxC = max($stats['countries']); $i = 1; ?>
       <ul class="rank-list">
-      <?php foreach (array_slice($stats['countries'], 0, 7, true) as $co => $c): ?>
+      <?php foreach (array_slice($stats['countries'], 0, 8, true) as $co => $c): ?>
         <li>
           <span class="rank-n"><?= $i++ ?></span>
           <span class="rank-label"><?= htmlspecialchars(countryName($co, $countryNames)) ?></span>
@@ -675,7 +675,7 @@ if ($isLocked) {
       </table>
     </div>
   </div>
-  <p class="file-info">analytics.db · <?= $stats['db_size'] ?> KB · <?= number_format($stats['db_rows']) ?> rows</p>
+  <?php if ($advancedMode): ?><p class="file-info">analytics.db · <?= $stats['db_size'] ?> KB · <?= number_format($stats['db_rows']) ?> rows</p><?php endif; ?>
 </div>
 
 <?php endif; // total > 0 ?>
