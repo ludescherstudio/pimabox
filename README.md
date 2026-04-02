@@ -78,27 +78,16 @@ fetch('/tracker.php?p=' + encodeURIComponent(location.pathname)
 
 Open `yourdomain.com/stats` in your browser, enter your password, and see your dashboard.
 
----
+### Step 4 — Make it yours (optional)
 
-## Branding
-
-pimabox's dashboard can match your site's colors, font, and logo — configured in a few lines of `config.php`:
+Open `config.php` and change the accent color to match your site:
 
 ```php
-define('BRAND_COLOR',    '#c4773a');          // Any CSS color — hex, rgb, hsl
-define('BRAND_LOGO',     '/assets/logo.svg'); // Path or URL to your logo (optional)
-define('BRAND_NAME',     'My Site');          // Shown in the header and browser tab
-define('BRAND_FONT',     'Georgia, serif');   // Any system font stack
-define('BRAND_FONT_URL', '');                 // Google Fonts URL if needed
+define('BRAND_COLOR', '#c4773a'); // any hex color
+define('BRAND_NAME',  'My Site'); // shown in the dashboard header
 ```
 
-One color change in `BRAND_COLOR` updates the entire dashboard — KPI accents, bar charts, rank bars, and badges all follow. Leave `BRAND_LOGO` empty to show the site name as text instead.
-
-**Using a Google Font:**
-```php
-define('BRAND_FONT',     'Lato, sans-serif');
-define('BRAND_FONT_URL', 'https://fonts.googleapis.com/css2?family=Lato:wght@400;700');
-```
+Logo, font and more can also be configured — see the Configuration reference below.
 
 ---
 
