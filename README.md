@@ -71,7 +71,11 @@ define('TIMEZONE',       'Europe/Vienna'); // full list: php.net/timezones
 
 ### Step 3 — Add the tracking snippet
 
-Paste this on **every page** you want to track — homepage, about, contact, imprint, blog posts, everything. It goes at the very end of your HTML, after your footer, directly before the closing `</body>` tag. If you're not sure where that is, search for `</body>` in your HTML file — there's only one. Replace `my-secret-word` with whatever you chose above:
+Replace `my-secret-word` with whatever you chose above.
+
+**Static HTML sites**
+
+Paste this into every HTML file you want to track — homepage, about, contact, imprint, blog posts, everything. It goes at the very end of your file, after your footer, directly before the closing `</body>` tag. If you're not sure where that is, search for `</body>` in your file — there's only one of them.
 
 ```html
 <script>
@@ -80,6 +84,23 @@ fetch('/tracker.php?p=' + encodeURIComponent(location.pathname)
   + '&t=my-secret-word');
 </script>
 ```
+
+**WordPress**
+
+Open your WordPress admin, go to **Appearance → Theme File Editor**, open `functions.php`, and paste this at the very end of the file:
+
+```php
+function pimabox_tracker() { ?>
+<script>
+fetch('/tracker.php?p=' + encodeURIComponent(location.pathname)
+  + '&r=' + encodeURIComponent(document.referrer)
+  + '&t=my-secret-word');
+</script>
+<?php }
+add_action('wp_footer', 'pimabox_tracker');
+```
+
+This runs automatically on every page of your WordPress site — no need to touch individual pages or posts.
 
 ### Done.
 
