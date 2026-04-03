@@ -1,5 +1,8 @@
 <p align="center">
-  <img src="pimabox_light_logo.svg" height="52" alt="pimabox">
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset="pimabox_dark_logo.svg">
+    <img src="pimabox_light_logo.svg" height="52" alt="pimabox">
+  </picture>
 </p>
 
 # pimabox
