@@ -80,6 +80,12 @@ $strings = [
         'views'            => 'views',
         'device_type'      => 'Device Type',
         'top_countries'    => 'Top Countries',
+        'channels'         => 'Traffic Channels',
+        'ch_direct'        => 'Direct',
+        'ch_organic'       => 'Organic Search',
+        'ch_social'        => 'Social',
+        'ch_referral'      => 'Referral',
+        'tip_channels'     => 'How visitors found your site: directly, via search engines, social media, or other websites.',
         'recent_hits'      => 'Recent %d Hits',
         'show'             => 'Show ↓',
         'hide'             => 'Hide ↑',
@@ -137,6 +143,12 @@ $strings = [
         'views'            => 'Aufrufe',
         'device_type'      => 'Gerätetyp',
         'top_countries'    => 'Länder',
+        'channels'         => 'Traffic-Quellen',
+        'ch_direct'        => 'Direkt',
+        'ch_organic'       => 'Organische Suche',
+        'ch_social'        => 'Social Media',
+        'ch_referral'      => 'Verweise',
+        'tip_channels'     => 'Wie Besucher auf deine Seite kamen: direkt, über Suchmaschinen, Social Media oder andere Websites.',
         'recent_hits'      => 'Letzte %d Aufrufe',
         'show'             => 'Anzeigen ↓',
         'hide'             => 'Ausblenden ↑',
@@ -232,6 +244,7 @@ $stats = [
     'hours'       => array_fill(0, 24, ['views' => 0, 'uniq' => []]),
     'languages'   => [],
     'entry_pages' => [],
+    'channels'    => ['direct' => 0, 'organic' => 0, 'social' => 0, 'referral' => 0],
     'recent'      => [],
     'db_size'     => 0,
     'db_rows'     => 0,
@@ -264,9 +277,9 @@ if ($authed) {
         $stats['last_month'] = (int) $db->querySingle("SELECT COUNT(*) FROM hits WHERE date >= '$lastMStart' AND date <= '$lastMEnd'");
 
         // Top pages (this month)
-        $res = $db->query("SELECT page, COUNT(*) as c FROM hits WHERE date >= '$monthStart' GROUP BY page ORDER BY c DESC LIMIT 8");
+        $res = $db->query("SELECT page, MAX(title) as title, COUNT(*) as c FROM hits WHERE date >= '$monthStart' GROUP BY page ORDER BY c DESC LIMIT 8");
         while ($row = $res->fetchArray(SQLITE3_ASSOC)) {
-            $stats['pages'][$row['page']] = $row['c'];
+            $stats['pages'][$row['page']] = ['c' => $row['c'], 'title' => $row['title'] ?? ''];
         }
 
         // Top pages prev month (same days as current month)
@@ -282,6 +295,26 @@ if ($authed) {
             $stats['referrers'][$ref] = ($stats['referrers'][$ref] ?? 0) + $row['c'];
         }
         arsort($stats['referrers']);
+
+        // Traffic channels
+        $searchEngines = ['google', 'bing', 'duckduckgo', 'yahoo', 'ecosia', 'yandex', 'baidu', 'qwant', 'startpage'];
+        $socialNets    = ['facebook', 'instagram', 'twitter', 'x.com', 'linkedin', 'tiktok', 'pinterest', 'youtube', 'reddit', 'whatsapp', 'telegram', 't.co'];
+        $resC = $db->query("SELECT referrer, COUNT(*) as c FROM hits GROUP BY referrer");
+        while ($rowC = $resC->fetchArray(SQLITE3_ASSOC)) {
+            $ref = strtolower($rowC['referrer'] ?? '');
+            $c   = $rowC['c'];
+            if (empty($ref)) {
+                $stats['channels']['direct'] += $c;
+            } else {
+                $isSearch = false;
+                $isSocial = false;
+                foreach ($searchEngines as $se) { if (strpos($ref, $se) !== false) { $isSearch = true; break; } }
+                foreach ($socialNets    as $sn) { if (strpos($ref, $sn) !== false) { $isSocial = true; break; } }
+                if ($isSearch)      $stats['channels']['organic']  += $c;
+                elseif ($isSocial)  $stats['channels']['social']   += $c;
+                else                $stats['channels']['referral'] += $c;
+            }
+        }
 
         // Devices
         $res = $db->query("SELECT device, COUNT(*) as c FROM hits GROUP BY device");
@@ -695,9 +728,11 @@ if ($isLocked) {
     <?php if (empty($stats['pages'])): ?>
       <p class="no-data"><?= $t['no_pages'] ?></p>
     <?php else:
-      $maxP = max($stats['pages']); $i = 1; ?>
+      $maxP = max(array_column($stats['pages'], 'c')); $i = 1; ?>
       <ul class="rank-list">
-      <?php foreach ($stats['pages'] as $p => $c):
+      <?php foreach ($stats['pages'] as $p => $pageData):
+        $c      = $pageData['c'];
+        $ptitle = $pageData['title'];
         $prev   = $stats['pages_prev'][$p] ?? 0;
         $diff   = $c - $prev;
         $dClass = $diff > 0 ? 'up' : ($diff < 0 ? 'down' : 'same');
@@ -705,7 +740,14 @@ if ($isLocked) {
       ?>
         <li>
           <span class="rank-n"><?= $i++ ?></span>
-          <span class="rank-label" title="<?= htmlspecialchars($p) ?>"><?= htmlspecialchars($p) ?></span>
+          <span class="rank-label" title="<?= htmlspecialchars($p) ?>">
+            <?php if (!empty($ptitle)): ?>
+              <span style="display:block;font-weight:600;font-size:.82rem;line-height:1.3;"><?= htmlspecialchars($ptitle) ?></span>
+              <span style="display:block;font-size:.7rem;color:var(--muted);line-height:1.3;"><?= htmlspecialchars($p) ?></span>
+            <?php else: ?>
+              <?= htmlspecialchars($p) ?>
+            <?php endif; ?>
+          </span>
           <div class="rank-track"><div class="rank-fill" style="width:<?= round($c/$maxP*100) ?>%"></div></div>
           <span class="rank-count"><?= $c ?></span>
           <span class="delta-pill <?= $dClass ?>"><?= $dLabel ?></span>
@@ -736,7 +778,7 @@ if ($isLocked) {
   </div>
 </div>
 
-<div class="grid-2">
+<div class="grid-3">
   <div class="card">
     <h2><span class="card-title"><?= $t['entry_pages'] ?> <i class="info-btn" data-tip="<?= htmlspecialchars($t['tip_entry']) ?>">i</i></span></h2>
     <?php if (empty($stats['entry_pages'])): ?>
@@ -747,7 +789,14 @@ if ($isLocked) {
       <?php foreach ($stats['entry_pages'] as $p => $c): ?>
         <li>
           <span class="rank-n"><?= $i++ ?></span>
-          <span class="rank-label" title="<?= htmlspecialchars($p) ?>"><?= htmlspecialchars($p) ?></span>
+          <span class="rank-label" title="<?= htmlspecialchars($p) ?>">
+            <?php if (!empty($ptitle)): ?>
+              <span style="display:block;font-weight:600;font-size:.82rem;line-height:1.3;"><?= htmlspecialchars($ptitle) ?></span>
+              <span style="display:block;font-size:.7rem;color:var(--muted);line-height:1.3;"><?= htmlspecialchars($p) ?></span>
+            <?php else: ?>
+              <?= htmlspecialchars($p) ?>
+            <?php endif; ?>
+          </span>
           <div class="rank-track"><div class="rank-fill" style="width:<?= round($c/$maxE*100) ?>%"></div></div>
           <span class="rank-count"><?= $c ?></span>
         </li>
@@ -755,6 +804,24 @@ if ($isLocked) {
       </ul>
       <p class="section-note"><?= $t['entry_note'] ?></p>
     <?php endif; ?>
+  </div>
+
+    <div class="card">
+    <h2><span class="card-title"><?= $t['channels'] ?> <i class="info-btn" data-tip="<?= htmlspecialchars($t['tip_channels']) ?>">i</i></span></h2>
+    <?php
+      $chTotal = array_sum($stats['channels']);
+      $chLabels = ['direct' => $t['ch_direct'], 'organic' => $t['ch_organic'], 'social' => $t['ch_social'], 'referral' => $t['ch_referral']];
+      arsort($stats['channels']);
+    ?>
+    <?php foreach ($stats['channels'] as $chKey => $chVal):
+      $chPct = $chTotal > 0 ? round($chVal / $chTotal * 100) : 0; ?>
+      <div class="dev-row">
+        <span class="dev-label" style="width:8rem;"><?= $chLabels[$chKey] ?></span>
+        <div class="dev-track"><div class="dev-fill" style="width:<?= $chPct ?>%;opacity:<?= $chKey === 'organic' ? '1' : ($chKey === 'social' ? '.75' : ($chKey === 'referral' ? '.5' : '.35')) ?>"></div></div>
+        <span class="dev-pct"><?= $chPct ?>%</span>
+      </div>
+    <?php endforeach; ?>
+  
   </div>
 
   <div class="card">
@@ -776,7 +843,6 @@ if ($isLocked) {
     <?php endif; ?>
   </div>
 </div>
-
 <div class="grid-3">
   <div class="card">
     <h2><span class="card-title"><?= $t['time_of_day'] ?> <i class="info-btn" data-tip="<?= htmlspecialchars($t['tip_tod']) ?>">i</i></span></h2>
