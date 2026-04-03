@@ -14,10 +14,13 @@ define('TRACKER_TOKEN', 'my-secret-word');
 // --- Timezone ---
 define('TIMEZONE', 'Europe/Vienna'); // full list: php.net/timezones
 
+// --- Language ---
+define('LANG', 'en'); // 'en' = English, 'de' = German
+
 // --- Branding ---
-define('BRAND_COLOR',    '#0d9488');
+define('BRAND_COLOR',    '#0d9488');          // any hex color
 define('BRAND_LOGO',     '');                // e.g. '/assets/logo.svg'
-define('BRAND_NAME',     'pimabox');
+define('BRAND_NAME',     'pimabox');         // change to your site name
 
 // --- Database ---
 define('DB_PATH', __DIR__ . '/cache/analytics.db');
