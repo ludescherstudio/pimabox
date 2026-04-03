@@ -257,8 +257,7 @@ if ($authed) {
         $trendFrom  = date('Y-m-d', strtotime('-' . (TREND_DAYS - 1) . ' days'));
         $weekStart  = date('Y-m-d', strtotime('Monday this week'));
         $prevStart  = date('Y-m-d', strtotime('Monday last week'));
-        // Fair comparison: same number of days as current week so far
-        $currentWeekDay = (int) date('N') - 1; // 0=Mon, 6=Sun
+        $currentWeekDay = (int) date('N') - 1;
         $prevEnd    = date('Y-m-d', strtotime('Monday last week + ' . $currentWeekDay . ' days'));
         $monthStart = date('Y-m-01');
         $lastMStart = date('Y-m-01', strtotime('first day of last month'));
