@@ -101,6 +101,7 @@ Paste this into every HTML file you want to track — homepage, about, contact, 
 ```html
 <script>
 fetch('/tracker.php?p=' + encodeURIComponent(location.pathname)
+  + '&title=' + encodeURIComponent(document.title)
   + '&r=' + encodeURIComponent(document.referrer)
   + '&t=my-secret-word');
 </script>
@@ -114,6 +115,7 @@ Open your WordPress admin, go to **Appearance → Theme File Editor**, open `fun
 function pimabox_tracker() { ?>
 <script>
 fetch('/tracker.php?p=' + encodeURIComponent(location.pathname)
+  + '&title=' + encodeURIComponent(document.title)
   + '&r=' + encodeURIComponent(document.referrer)
   + '&t=my-secret-word');
 </script>
