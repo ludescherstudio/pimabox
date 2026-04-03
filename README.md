@@ -42,14 +42,16 @@ your-webroot/
     └── .htaccess
 ```
 
-> **Already have a `.htaccess`?** Don't overwrite it. Just add this one line:
+> **Already have a `.htaccess`?** Don't overwrite it. Just add these two lines:
 > ```apache
-> RewriteRule ^pimabox$ pimabox.php [L]
+> RewriteRule ^pimabox$   pimabox.php [L]
+> RewriteRule ^analytics$ pimabox.php [L]
 > ```
 
 > **Already have a `robots.txt`?** Add these lines to it instead:
 > ```
 > Disallow: /pimabox
+> Disallow: /analytics
 > Disallow: /tracker.php
 > Disallow: /cache/
 > ```
@@ -104,7 +106,7 @@ This runs automatically on every page of your WordPress site — no need to touc
 
 ### Done.
 
-Open `yourdomain.com/pimabox` in your browser, enter your password, and see your dashboard.
+Open `yourdomain.com/pimabox` or `yourdomain.com/analytics` in your browser, enter your password, and see your dashboard.
 
 ### Step 4 — Make it yours (optional)
 
