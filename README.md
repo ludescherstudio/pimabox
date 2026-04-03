@@ -30,10 +30,6 @@ Designed for beginners — if you can upload files via FTP and edit a text file,
 
 ---
 
----
-
----
-
 ## Installation
 
 ### Step 1 — Upload files
@@ -147,10 +143,6 @@ Supported formats: SVG, PNG, JPG, WebP. The logo appears centered above the summ
 
 ---
 
----
-
----
-
 ## Language
 
 pimabox ships in English and German. Set your language in `config.php`:
@@ -161,10 +153,6 @@ define('LANG', 'en'); // 'en' = English, 'de' = German
 ```
 
 **Adding your own language** takes about 5 minutes — open `pimabox.php`, find the `$strings` array, copy the `'en'` block, give it a new key (e.g. `'fr'`), translate the strings, and set `LANG` to `'fr'` in your config. All dashboard labels, tooltips, and messages will follow.
-
----
-
----
 
 ---
 
@@ -192,10 +180,6 @@ define('LOCKOUT_SECONDS',    900);  // Lockout duration (900 = 15 minutes)
 
 ---
 
----
-
----
-
 ## Dashboard
 
 - **Summary** — Monthly pageviews and estimated visitors at a glance
@@ -213,10 +197,6 @@ define('LOCKOUT_SECONDS',    900);  // Lockout duration (900 = 15 minutes)
 
 ---
 
----
-
----
-
 ## What gets tracked
 
 | Field | Example | Notes |
@@ -229,10 +209,6 @@ define('LOCKOUT_SECONDS',    900);  // Lockout duration (900 = 15 minutes)
 | Country | `AT` | Via IP lookup — IP itself never stored |
 
 **Never stored:** IP address, cookies, fingerprint, user identity, browser details.
-
----
-
----
 
 ---
 
@@ -260,10 +236,6 @@ define('ADVANCED_MODE',     false);                              // Enable dange
 
 ---
 
----
-
----
-
 ## Privacy & GDPR
 
 - No cookies — no consent banner needed
@@ -271,10 +243,6 @@ define('ADVANCED_MODE',     false);                              // Enable dange
 - Only the country code (e.g. `AT`) is stored, not the IP
 - All data stays on your own server
 - For zero external requests: set `GEO_ENABLED = false`
-
----
-
----
 
 ---
 
@@ -296,19 +264,11 @@ Disable again by setting it back to `false`.
 
 ---
 
----
-
----
-
 ## Honest limitations
 
 - **Pageviews, not unique visitors** — without cookies or fingerprinting, sessions can't be tracked. This is intentional.
 - **Not for high-traffic sites** — SQLite handles millions of rows comfortably, but concurrent write spikes (500+ simultaneous visitors) may cause brief delays.
 - **No real-time view** — dashboard reflects data as written to the database.
-
----
-
----
 
 ---
 
@@ -323,10 +283,6 @@ Disable again by setting it back to `false`.
 
 ---
 
----
-
----
-
 ## License
 
 MIT — free to use, modify, and self-host.
@@ -334,10 +290,6 @@ MIT — free to use, modify, and self-host.
 ---
 
 *pimabox — measure more. manage less.*
-
----
-
----
 
 ---
 
