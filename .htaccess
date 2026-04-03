@@ -1,6 +1,7 @@
-# Clean URL: meinedomain.at/pimabox → stats.php
+# Dashboard URLs — all three lead to the same place
 RewriteEngine On
-RewriteRule ^pimabox$ pimabox.php [L]
+RewriteRule ^pimabox$   pimabox.php [L]
+RewriteRule ^analytics$ pimabox.php [L]
 
 # Block direct access to config and cache
 <Files "config.php">
