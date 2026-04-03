@@ -227,6 +227,18 @@ define('ADVANCED_MODE',     false);                              // Enable dange
 
 ---
 
+## Language
+
+pimabox ships in English and German. Set your language in `config.php`:
+
+```php
+define('LANG', 'en'); // 'en' = English, 'de' = German
+```
+
+**Adding your own language** takes about 5 minutes — open `pimabox.php`, find the `$strings` array, copy the `'en'` block, give it a new key (e.g. `'fr'`), translate the strings, and set `LANG` to `'fr'` in your config. All dashboard labels, tooltips, and messages will follow.
+
+---
+
 ## Advanced Mode
 
 For power users who want extra control. Disabled by default — won't appear for regular users.
