@@ -244,7 +244,9 @@ if ($authed) {
         $trendFrom  = date('Y-m-d', strtotime('-' . (TREND_DAYS - 1) . ' days'));
         $weekStart  = date('Y-m-d', strtotime('Monday this week'));
         $prevStart  = date('Y-m-d', strtotime('Monday last week'));
-        $prevEnd    = date('Y-m-d', strtotime('Sunday last week'));
+        // Fair comparison: same number of days as current week so far
+        $currentWeekDay = (int) date('N') - 1; // 0=Mon, 6=Sun
+        $prevEnd    = date('Y-m-d', strtotime('Monday last week + ' . $currentWeekDay . ' days'));
         $monthStart = date('Y-m-01');
         $lastMStart = date('Y-m-01', strtotime('first day of last month'));
         // Compare same number of days as current month (fair comparison)
@@ -459,6 +461,19 @@ if ($isLocked) {
   .kpi-delta.down { color:#c0392b; }
   .kpi-delta.same { color:var(--muted); }
 
+  /* Delta pills */
+  .pill { display:inline-flex; align-items:center; gap:.25rem; padding:.2rem .55rem; border-radius:20px; font-size:.72rem; font-weight:600; margin-top:.4rem; }
+  .pill.up   { background:#e8f5e9; color:#2d6a4f; }
+  .pill.down { background:#fdecea; color:#c0392b; }
+  .pill.same { background:var(--bg); color:var(--muted); }
+  .pill svg  { width:10px; height:10px; flex-shrink:0; }
+
+  /* Rank delta pills */
+  .delta-pill { display:inline-flex; align-items:center; gap:.2rem; padding:.15rem .45rem; border-radius:20px; font-size:.65rem; font-weight:600; flex-shrink:0; }
+  .delta-pill.up   { background:#e8f5e9; color:#2d6a4f; }
+  .delta-pill.down { background:#fdecea; color:#c0392b; }
+  .delta-pill.same { background:var(--bg); color:var(--muted); }
+
   .card { background:var(--surface); border:1px solid var(--border); border-radius:14px; padding:1.5rem; margin-bottom:14px; }
   .card h2 { font-family:var(--font); font-size:.95rem; font-weight:700; margin-bottom:1rem; padding-bottom:.75rem; border-bottom:1px solid var(--border); }
   .grid-2 { display:grid; grid-template-columns:1fr 1fr; gap:14px; margin-bottom:14px; }
@@ -486,10 +501,7 @@ if ($isLocked) {
   .rank-track { width:60px; height:5px; background:var(--bg); border-radius:3px; overflow:hidden; flex-shrink:0; }
   .rank-fill { height:100%; background:var(--accent); opacity:.6; border-radius:3px; }
   .rank-count { font-size:.8rem; font-weight:600; width:2.2rem; text-align:right; flex-shrink:0; }
-  .delta { font-size:.68rem; width:2.8rem; text-align:right; flex-shrink:0; }
-  .delta.up   { color:#2d6a4f; }
-  .delta.down { color:#b5341b; }
-  .delta.same { color:var(--muted); }
+  /* delta replaced by delta-pill */
 
   .dev-row { display:flex; align-items:center; gap:.75rem; padding:.4rem 0; }
   .dev-label { font-size:.8rem; width:4.5rem; flex-shrink:0; }
@@ -630,6 +642,13 @@ if ($isLocked) {
   <div class="summary-date"><?= date('d. F Y') ?> · <?= TIMEZONE ?></div>
 </div>
 
+<?php
+  $arrowUp   = '<svg viewBox="0 0 10 10" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M5 8V2M5 2L2 5M5 2L8 5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+  $arrowDown = '<svg viewBox="0 0 10 10" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M5 2V8M5 8L2 5M5 8L8 5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+
+  $weekArrow  = $weekDiff  > 0 ? $arrowUp : ($weekDiff  < 0 ? $arrowDown : '');
+  $monthArrow = $monthDiff > 0 ? $arrowUp : ($monthDiff < 0 ? $arrowDown : '');
+?>
 <div class="kpi-row">
   <div class="kpi highlight">
     <div class="kpi-label"><?= $t['total_views'] ?></div>
@@ -644,12 +663,12 @@ if ($isLocked) {
   <div class="kpi">
     <div class="kpi-label"><?= $t['this_week'] ?></div>
     <div class="kpi-value"><?= number_format($stats['this_week']) ?></div>
-    <div class="kpi-delta <?= $weekClass ?>"><?= $weekDelta ?> <?= $t['vs_last_week'] ?></div>
+    <div class="pill <?= $weekClass ?>"><?= $weekArrow ?><?= $weekDelta ?> <?= $t['vs_last_week'] ?></div>
   </div>
   <div class="kpi">
     <div class="kpi-label"><?= $t['this_month'] ?></div>
     <div class="kpi-value"><?= number_format($stats['this_month']) ?></div>
-    <div class="kpi-delta <?= $monthClass ?>"><?= $monthDelta ?> <?= $t['vs_last_month'] ?></div>
+    <div class="pill <?= $monthClass ?>"><?= $monthArrow ?><?= $monthDelta ?> <?= $t['vs_last_month'] ?></div>
   </div>
 </div>
 
@@ -689,7 +708,7 @@ if ($isLocked) {
           <span class="rank-label" title="<?= htmlspecialchars($p) ?>"><?= htmlspecialchars($p) ?></span>
           <div class="rank-track"><div class="rank-fill" style="width:<?= round($c/$maxP*100) ?>%"></div></div>
           <span class="rank-count"><?= $c ?></span>
-          <span class="delta <?= $dClass ?>"><?= $dLabel ?></span>
+          <span class="delta-pill <?= $dClass ?>"><?= $dLabel ?></span>
         </li>
       <?php endforeach; ?>
       </ul>
@@ -781,10 +800,17 @@ if ($isLocked) {
 
   <div class="card">
     <h2><span class="card-title"><?= $t['device_type'] ?> <i class="info-btn" data-tip="<?= htmlspecialchars($t['tip_device']) ?>">i</i></span></h2>
+    <?php
+      $deviceIcons = [
+        'desktop' => '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>',
+        'mobile'  => '<svg width="12" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="2" width="14" height="20" rx="2"/><circle cx="12" cy="17" r="1" fill="currentColor"/></svg>',
+        'tablet'  => '<svg width="12" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="2" width="16" height="20" rx="2"/><circle cx="12" cy="17" r="1" fill="currentColor"/></svg>',
+      ];
+    ?>
     <?php foreach (['desktop','mobile','tablet'] as $type):
       $pct = $devTotal > 0 ? round($stats['devices'][$type] / $devTotal * 100) : 0; ?>
       <div class="dev-row">
-        <span class="dev-label"><?= ucfirst($type) ?></span>
+        <span class="dev-label" style="display:flex;align-items:center;gap:.4rem;"><?= $deviceIcons[$type] ?><?= ucfirst($type) ?></span>
         <div class="dev-track"><div class="dev-fill <?= $type ?>" style="width:<?= $pct ?>%"></div></div>
         <span class="dev-pct"><?= $pct ?>%</span>
       </div>
