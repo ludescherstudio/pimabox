@@ -5,8 +5,6 @@
   </picture>
 </p>
 
-# pimabox
-
 > *Pima* (Swahili) — to measure, to assess.  
 > *Box* — a self-contained system you drop in and it runs.  
 > **pimabox** is exactly that: a compact, silent little box you put on your server that measures your website traffic. No cloud. No complexity. Just your data, on your hosting.
@@ -280,4 +278,4 @@ MIT — free to use, modify, and self-host.
 
 pimabox is free and open-source. If it saves you time or a cookie banner, consider buying me a coffee. ☕
 
-[![ko-fi](https://ko-fi.com/img/githubbutton_sm.svg)](https://ko-fi.com/ludescherstudio)
+<a href="https://ko-fi.com/ludescherstudio" target="_blank"><img src="https://ko-fi.com/img/githubbutton_sm.svg" alt="ko-fi"></a>
