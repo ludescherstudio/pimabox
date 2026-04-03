@@ -30,6 +30,10 @@ Designed for beginners — if you can upload files via FTP and edit a text file,
 
 ---
 
+---
+
+---
+
 ## Installation
 
 ### Step 1 — Upload files
@@ -66,9 +70,14 @@ your-webroot/
 Open `config.php` and set two things:
 
 ```php
-define('STATS_PASSWORD', 'your-dashboard-password');  // to log into your dashboard
-define('TRACKER_TOKEN',  'my-secret-word');            // a second password for the snippet below
-define('TIMEZONE',       'Europe/Vienna'); // full list: php.net/timezones
+// --- Auth ---
+define('STATS_PASSWORD', 'your-dashboard-password');
+
+// --- Tracker token ---
+define('TRACKER_TOKEN', 'my-secret-word');
+
+// --- Timezone ---
+define('TIMEZONE', 'Europe/Vienna'); // full list: php.net/timezones
 ```
 
 > **Why two passwords?**  
@@ -118,9 +127,10 @@ Open `yourdomain.com/pimabox` or `yourdomain.com/analytics` in your browser, ent
 Open `config.php` and adapt the dashboard to match your site:
 
 ```php
+// --- Branding ---
 define('BRAND_COLOR', '#0d9488'); // any hex color, e.g. '#c0392b' for red
-define('BRAND_NAME',  'My Site'); // shown above the summary sentence
 define('BRAND_LOGO',  '');        // path or URL to your logo (see below)
+define('BRAND_NAME',  'pimabox'); // change this to your site name
 ```
 
 **Adding your logo:**
@@ -134,6 +144,27 @@ define('BRAND_LOGO', 'https://yourdomain.com/assets/logo.png');
 ```
 
 Supported formats: SVG, PNG, JPG, WebP. The logo appears centered above the summary sentence. Leave empty to show `BRAND_NAME` as text instead.
+
+---
+
+---
+
+---
+
+## Language
+
+pimabox ships in English and German. Set your language in `config.php`:
+
+```php
+// --- Language ---
+define('LANG', 'en'); // 'en' = English, 'de' = German
+```
+
+**Adding your own language** takes about 5 minutes — open `pimabox.php`, find the `$strings` array, copy the `'en'` block, give it a new key (e.g. `'fr'`), translate the strings, and set `LANG` to `'fr'` in your config. All dashboard labels, tooltips, and messages will follow.
+
+---
+
+---
 
 ---
 
@@ -161,18 +192,7 @@ define('LOCKOUT_SECONDS',    900);  // Lockout duration (900 = 15 minutes)
 
 ---
 
-## What gets tracked
-
-| Field | Example | Notes |
-|---|---|---|
-| Date | `2024-03-15` | Server date |
-| Time | `14:32:01` | Server time |
-| Page | `/blog/hello-world` | URL path |
-| Referrer | `google.com` | Domain only |
-| Device | `desktop` / `mobile` / `tablet` | Via User-Agent, never stored |
-| Country | `AT` | Via IP lookup — IP itself never stored |
-
-**Never stored:** IP address, cookies, fingerprint, user identity, browser details.
+---
 
 ---
 
@@ -190,6 +210,29 @@ define('LOCKOUT_SECONDS',    900);  // Lockout duration (900 = 15 minutes)
 - **Countries** — Top countries
 - **Recent hits** — Last 50 page views (collapsed by default)
 - **CSV Export** — Download all your data anytime
+
+---
+
+---
+
+---
+
+## What gets tracked
+
+| Field | Example | Notes |
+|---|---|---|
+| Date | `2024-03-15` | Server date |
+| Time | `14:32:01` | Server time |
+| Page | `/blog/hello-world` | URL path |
+| Referrer | `google.com` | Domain only |
+| Device | `desktop` / `mobile` / `tablet` | Via User-Agent, never stored |
+| Country | `AT` | Via IP lookup — IP itself never stored |
+
+**Never stored:** IP address, cookies, fingerprint, user identity, browser details.
+
+---
+
+---
 
 ---
 
@@ -217,6 +260,10 @@ define('ADVANCED_MODE',     false);                              // Enable dange
 
 ---
 
+---
+
+---
+
 ## Privacy & GDPR
 
 - No cookies — no consent banner needed
@@ -227,15 +274,7 @@ define('ADVANCED_MODE',     false);                              // Enable dange
 
 ---
 
-## Language
-
-pimabox ships in English and German. Set your language in `config.php`:
-
-```php
-define('LANG', 'en'); // 'en' = English, 'de' = German
-```
-
-**Adding your own language** takes about 5 minutes — open `pimabox.php`, find the `$strings` array, copy the `'en'` block, give it a new key (e.g. `'fr'`), translate the strings, and set `LANG` to `'fr'` in your config. All dashboard labels, tooltips, and messages will follow.
+---
 
 ---
 
@@ -257,11 +296,19 @@ Disable again by setting it back to `false`.
 
 ---
 
+---
+
+---
+
 ## Honest limitations
 
 - **Pageviews, not unique visitors** — without cookies or fingerprinting, sessions can't be tracked. This is intentional.
 - **Not for high-traffic sites** — SQLite handles millions of rows comfortably, but concurrent write spikes (500+ simultaneous visitors) may cause brief delays.
 - **No real-time view** — dashboard reflects data as written to the database.
+
+---
+
+---
 
 ---
 
@@ -276,6 +323,10 @@ Disable again by setting it back to `false`.
 
 ---
 
+---
+
+---
+
 ## License
 
 MIT — free to use, modify, and self-host.
@@ -283,6 +334,10 @@ MIT — free to use, modify, and self-host.
 ---
 
 *pimabox — measure more. manage less.*
+
+---
+
+---
 
 ---
 
