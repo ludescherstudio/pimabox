@@ -1,7 +1,7 @@
 <p align="center">
   <picture>
-    <source media="(prefers-color-scheme: dark)" srcset="pimabox_dark_logo.svg">
-    <img src="pimabox_light_logo.svg" height="52" alt="pimabox">
+    <source media="(prefers-color-scheme: dark)" srcset="assets/pimabox_dark_logo.svg">
+    <img src="assets/pimabox_light_logo.svg" height="52" alt="pimabox">
   </picture>
 </p>
 
@@ -33,8 +33,8 @@ Designed for beginners — if you can upload files via FTP and edit a text file,
 ## Screenshots
 
 <p align="center">
-  <a href="screenshot_1.webp"><img src="screenshot_1.webp" alt="pimabox dashboard — overview" width="49%"></a>
-  <a href="screenshot_2.webp"><img src="screenshot_2.webp" alt="pimabox dashboard — details" width="49%"></a>
+  <a href="assets/screenshot_1.webp"><img src="assets/screenshot_1.webp" alt="pimabox dashboard — overview" width="49%"></a>
+  <a href="assets/screenshot_2.webp"><img src="assets/screenshot_2.webp" alt="pimabox dashboard — details" width="49%"></a>
 </p>
 
 ---
