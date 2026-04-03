@@ -218,6 +218,7 @@ $stats = [
     'today'       => 0,
     'uniq_today'  => 0,
     'uniq_total'  => 0,
+    'uniq_month'  => 0,
     'this_week'   => 0,
     'last_week'   => 0,
     'this_month'  => 0,
@@ -254,6 +255,7 @@ if ($authed) {
         $stats['today']      = (int) $db->querySingle("SELECT COUNT(*) FROM hits WHERE date = '$today'");
         $stats['uniq_today'] = (int) $db->querySingle("SELECT COUNT(DISTINCT vid) FROM hits WHERE date = '$today' AND vid != ''");
         $stats['uniq_total'] = (int) $db->querySingle("SELECT COUNT(DISTINCT vid) FROM hits WHERE vid != ''");
+        $stats['uniq_month'] = (int) $db->querySingle("SELECT COUNT(DISTINCT vid) FROM hits WHERE date >= '$monthStart' AND vid != ''");
         $stats['this_week']  = (int) $db->querySingle("SELECT COUNT(*) FROM hits WHERE date >= '$weekStart'");
         $stats['last_week']  = (int) $db->querySingle("SELECT COUNT(*) FROM hits WHERE date >= '$prevStart' AND date <= '$prevEnd'");
         $stats['this_month'] = (int) $db->querySingle("SELECT COUNT(*) FROM hits WHERE date >= '$monthStart'");
@@ -526,7 +528,8 @@ if ($isLocked) {
   .no-data { color:var(--muted); font-size:.82rem; padding:.5rem 0; }
 
   /* Info tooltips */
-  .card-title { display:flex; align-items:center; gap:.5rem; }
+  .card-title { display:flex; align-items:center; gap:.5rem; overflow:visible; }
+  .card h2 { overflow:visible; }
   .info-btn {
     display:inline-flex; align-items:center; justify-content:center;
     width:12px; height:12px; border-radius:50%;
@@ -622,7 +625,7 @@ if ($isLocked) {
 
 <div class="summary">
   <div class="summary-sentence">
-    <?= sprintf($t['summary'], number_format($stats['this_month']), number_format($stats['uniq_total'])) ?>
+    <?= sprintf($t['summary'], number_format($stats['this_month']), number_format($stats['uniq_month'])) ?>
   </div>
   <div class="summary-date"><?= date('d. F Y') ?> · <?= TIMEZONE ?></div>
 </div>
