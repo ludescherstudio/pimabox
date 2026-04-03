@@ -23,10 +23,10 @@ Designed for beginners — if you can upload files via FTP and edit a text file,
 | | pimabox | Matomo | Plausible | Google Analytics |
 |---|---|---|---|---|
 | No cookies | ✅ | ⚠️ | ✅ | ❌ |
-| No external database | ✅ | ❌ | ❌ | — |
-| Shared hosting | ✅ | ⚠️ | ❌ | — |
+| No external database | ✅ | ❌ MySQL | ❌ PostgreSQL + ClickHouse | — |
+| Shared hosting | ✅ | ⚠️ | ❌ requires Docker | — |
 | Self-hosted | ✅ | ✅ | ✅ | ❌ |
-| Install time | ~5 min | 30 min | 1–2h | 5 min |
+| Install time | ~5 min | 30+ min | 1–2h | 5 min |
 
 ---
 
