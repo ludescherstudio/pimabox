@@ -33,11 +33,8 @@ Designed for beginners — if you can upload files via FTP and edit a text file,
 ## Screenshots
 
 <p align="center">
-  <img src="screenshot_1.webp" alt="pimabox dashboard — overview" width="100%">
-</p>
-
-<p align="center">
-  <img src="screenshot_2.webp" alt="pimabox dashboard — details" width="100%">
+  <a href="screenshot_1.webp"><img src="screenshot_1.webp" alt="pimabox dashboard — overview" width="49%"></a>
+  <a href="screenshot_2.webp"><img src="screenshot_2.webp" alt="pimabox dashboard — details" width="49%"></a>
 </p>
 
 ---
