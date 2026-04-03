@@ -110,14 +110,25 @@ Open `yourdomain.com/pimabox` or `yourdomain.com/analytics` in your browser, ent
 
 ### Step 4 — Make it yours (optional)
 
-Open `config.php` and change the accent color to match your site:
+Open `config.php` and adapt the dashboard to match your site:
 
 ```php
-define('BRAND_COLOR', '#0d9488'); // any hex color — avoid Google Fonts for GDPR compliance
-define('BRAND_NAME',  'My Site'); // shown in the dashboard header
+define('BRAND_COLOR', '#0d9488'); // any hex color, e.g. '#c0392b' for red
+define('BRAND_NAME',  'My Site'); // shown above the summary sentence
+define('BRAND_LOGO',  '');        // path or URL to your logo (see below)
 ```
 
-Logo, font and more can also be configured — see the Configuration reference below.
+**Adding your logo:**
+
+```php
+// Option A — file on your server (recommended)
+define('BRAND_LOGO', '/assets/logo.svg');
+
+// Option B — full URL
+define('BRAND_LOGO', 'https://yourdomain.com/assets/logo.png');
+```
+
+Supported formats: SVG, PNG, JPG, WebP. The logo appears centered above the summary sentence. Leave empty to show `BRAND_NAME` as text instead.
 
 ---
 
