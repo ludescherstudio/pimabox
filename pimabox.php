@@ -246,7 +246,9 @@ if ($authed) {
         $prevEnd    = date('Y-m-d', strtotime('Sunday last week'));
         $monthStart = date('Y-m-01');
         $lastMStart = date('Y-m-01', strtotime('first day of last month'));
-        $lastMEnd   = date('Y-m-t', strtotime('last month'));
+        // Compare same number of days as current month (fair comparison)
+        $currentDay = (int) date('j');
+        $lastMEnd   = date('Y-m-', strtotime('first day of last month')) . sprintf('%02d', $currentDay);
 
         $stats['total']      = (int) $db->querySingle('SELECT COUNT(*) FROM hits');
         $stats['today']      = (int) $db->querySingle("SELECT COUNT(*) FROM hits WHERE date = '$today'");
@@ -263,7 +265,7 @@ if ($authed) {
             $stats['pages'][$row['page']] = $row['c'];
         }
 
-        // Top pages prev month
+        // Top pages prev month (same days as current month)
         $res = $db->query("SELECT page, COUNT(*) as c FROM hits WHERE date >= '$lastMStart' AND date <= '$lastMEnd' GROUP BY page ORDER BY c DESC LIMIT 8");
         while ($row = $res->fetchArray(SQLITE3_ASSOC)) {
             $stats['pages_prev'][$row['page']] = $row['c'];
