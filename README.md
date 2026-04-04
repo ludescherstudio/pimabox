@@ -45,32 +45,34 @@ Designed for beginners — if you can upload files via FTP and edit a text file,
 
 ### Step 1 — Upload files
 
-Upload these files to your web root via FTP:
+Upload the following to your web root via FTP:
 
 ```
 your-webroot/
 ├── tracker.php
 ├── pimabox.php
 ├── config.php
-├── robots.txt      ← merge with yours if you already have one
-├── .htaccess       ← add the Rewrite line if you already have one (see below)
 └── cache/
     └── .htaccess
 ```
 
-> **Already have a `.htaccess`?** Don't overwrite it. Just add these two lines:
-> ```apache
-> RewriteRule ^pimabox$   pimabox.php [L]
-> RewriteRule ^analytics$ pimabox.php [L]
-> ```
+Then add the following lines to your existing **`.htaccess`**:
 
-> **Already have a `robots.txt`?** Add these lines to it instead:
-> ```
-> Disallow: /pimabox
-> Disallow: /analytics
-> Disallow: /tracker.php
-> Disallow: /cache/
-> ```
+```apache
+RewriteRule ^pimabox$   pimabox.php [L]
+RewriteRule ^analytics$ pimabox.php [L]
+```
+
+And add these lines to your existing **`robots.txt`**:
+
+```
+Disallow: /pimabox
+Disallow: /analytics
+Disallow: /tracker.php
+Disallow: /cache/
+```
+
+> **Don't have a `.htaccess` or `robots.txt` yet?** You can find ready-made versions in the repository root — just upload them as-is.
 
 ### Step 2 — Set your passwords and timezone
 
