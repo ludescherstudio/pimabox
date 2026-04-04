@@ -275,6 +275,43 @@ Disable again by setting it back to `false`.
 
 ---
 
+## Troubleshooting
+
+### "No data yet" — dashboard stays empty
+
+The most common reason: the tracking snippet is missing or the token is wrong.
+
+1. Open your page in the browser, right-click → View Page Source, and search for `tracker.php` — if it's not there, the snippet wasn't added correctly
+2. Make sure the token in your snippet matches `TRACKER_TOKEN` in `config.php` exactly — it's case-sensitive
+3. Check that the `cache/` folder exists on your server. If it's missing, create it manually via FTP and set permissions to `0750`
+4. To test the tracker directly, open `yourdomain.com/tracker.php?p=/test&t=YOUR_TOKEN` in your browser — you should see a blank white page (1×1 pixel), not an error
+
+### Login doesn't work
+
+Open `config.php` and check `STATS_PASSWORD` — watch out for extra spaces or special characters that your text editor may have added. The password is case-sensitive.
+
+If you're locked out after too many attempts, wait 15 minutes or increase `MAX_LOGIN_ATTEMPTS` temporarily.
+
+### Dashboard is blank
+
+A typo in `config.php` can cause a PHP error that breaks the dashboard. Check:
+
+- All `define()` lines end with a semicolon
+- Strings are properly closed with a single quote
+- No accidental characters were added while editing
+
+Re-uploading the original `config.php` and re-entering your settings is often the fastest fix.
+
+### No country data showing
+
+Country detection requires `allow_url_fopen` to be enabled on your server (it usually is on shared hosting). If countries stay empty, set `GEO_ENABLED = false` in `config.php` to confirm this is the cause. Contact your host if you want to enable it.
+
+### Tracker works but pages show wrong URLs
+
+pimabox tracks the URL path exactly as sent by the browser. If your pages have `.html` extensions (e.g. `/about.html`), that's what will appear. This is not a bug — it reflects your actual URL structure.
+
+---
+
 ## Honest limitations
 
 - **Pageviews, not unique visitors** — without cookies or fingerprinting, sessions can't be tracked. This is intentional.
@@ -291,6 +328,35 @@ Disable again by setting it back to `false`.
 - SQLite3 and PDO_SQLITE extensions enabled (standard on all major hosts)
 - `allow_url_fopen` (only for country detection)
 - HTTPS (strongly recommended)
+
+---
+
+## Troubleshooting
+
+**Dashboard shows "No data yet" after adding the snippet**
+Check that the tracker token in your snippet matches `TRACKER_TOKEN` in `config.php` exactly. Also verify that the `cache/` folder exists on your server and has write permissions (750).
+
+**Dashboard is completely blank**
+This is usually a PHP syntax error in `config.php`. Check that your password doesn't contain special characters like `$` or `'` — if it does, choose a simpler password with only letters and numbers.
+
+**Country detection not working**
+Your host may have `allow_url_fopen` disabled. Set `GEO_ENABLED = false` in `config.php` to disable country lookup — everything else will continue to work normally.
+
+**Login fails even with the correct password**
+Watch out for accidental spaces when copy-pasting your password into `config.php`. The value must be exactly what you type at login — no leading or trailing spaces.
+
+**`/pimabox` or `/analytics` returns a 404**
+`mod_rewrite` may be disabled on your server, or `.htaccess` files may not be allowed. Contact your host and ask them to enable `mod_rewrite` and `AllowOverride All`.
+
+**Your own visits are showing up in the stats**
+Add your IP address to `EXCLUDED_IPS` in `config.php`:
+```php
+define('EXCLUDED_IPS', ['your.ip.address']);
+```
+You can find your current IP at [whatismyip.com](https://www.whatismyip.com).
+
+**Something looks wrong and you're not sure why**
+Try clearing the cache: connect via FTP, open the `cache/` folder, and delete everything except `.htaccess`. The database will be recreated automatically on the next page visit. You can also do this from the dashboard if `ADVANCED_MODE` is enabled.
 
 ---
 
