@@ -41,6 +41,8 @@ Designed for beginners — if you can upload files via FTP and edit a text file,
 
 ## Installation
 
+### Manual install
+
 ### Step 1 — Upload files
 
 Upload these files to your web root via FTP:
@@ -151,6 +153,19 @@ define('BRAND_LOGO', 'https://yourdomain.com/assets/logo.png');
 ```
 
 Supported formats: SVG, PNG, JPG, WebP. The logo appears centered above the summary sentence. Leave empty to show `BRAND_NAME` as text instead.
+
+
+---
+
+### Quick install (SSH)
+
+If your server has SSH access:
+
+```bash
+bash <(curl -sSL https://raw.githubusercontent.com/ludescherstudio/pimabox/main/install.sh)
+```
+
+The script downloads all files, creates the `cache/` directory, merges safely with any existing `.htaccess` and `robots.txt`, and walks you through setting your password and token interactively.
 
 ---
 
