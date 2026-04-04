@@ -76,7 +76,7 @@ Disallow: /cache/
 
 ### Step 2 — Set your passwords and timezone
 
-Open `config.php` and set two things:
+Open `config.php` and set three things:
 
 ```php
 // --- Auth ---
