@@ -1,7 +1,0 @@
-User-agent: *
-Disallow: /pimabox
-Disallow: /analytics
-
-Disallow: /tracker.php
-Disallow: /config.php
-Disallow: /cache/
