@@ -411,4 +411,3 @@ MIT — free to use, modify, and self-host.
 pima Analytics is free and open-source. If it saves you time or a cookie banner, consider buying me a coffee. ☕
 
 <a href="https://ko-fi.com/ludescherstudio" target="_blank"><img src="https://ko-fi.com/img/githubbutton_sm.svg" alt="ko-fi"></a>
-          
