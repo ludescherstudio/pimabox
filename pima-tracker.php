@@ -1,6 +1,6 @@
 <?php
 // ============================================================
-// pima — pima-tracker.php
+// pima-tracker.php
 // Receives page view pings, filters bots, logs to SQLite.
 // No cookies. No IP storage. GDPR-friendly.
 // ============================================================
@@ -10,7 +10,7 @@ header('Cache-Control: no-store, no-cache, must-revalidate');
 header('Access-Control-Allow-Origin: *');
 echo base64_decode('R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7');
 
-$configPath = __DIR__ . '/pima-core.php';
+$configPath = __DIR__ . '/config.php';
 if (!file_exists($configPath)) exit;
 require_once $configPath;
 
@@ -18,7 +18,7 @@ date_default_timezone_set(TIMEZONE);
 
 // ---- Tracker token check ----
 if (defined('TRACKER_TOKEN') && TRACKER_TOKEN !== '') {
-    if (!hash_equals(TRACKER_TOKEN, (string) ($_GET['t'] ?? ''))) exit;
+    if (($_GET['t'] ?? '') !== TRACKER_TOKEN) exit;
 }
 
 // ---- Helpers ----
@@ -33,10 +33,8 @@ function isBot(string $ua): bool {
 }
 
 function getDevice(string $ua): string {
-    // Tablet check first: iPad UAs contain "Mobile" and would otherwise
-    // be mis-classified as mobile.
-    if (preg_match('/(ipad|tablet|playbook|silk|kindle)/i', $ua)) return 'tablet';
     if (preg_match('/(mobile|android|iphone|ipod|blackberry|windows phone|opera mini)/i', $ua)) return 'mobile';
+    if (preg_match('/(tablet|ipad)/i', $ua)) return 'tablet';
     return 'desktop';
 }
 
@@ -92,7 +90,7 @@ function visitorHash(string $ip, string $ua, string $date): string {
             fclose($fh);
         }
         foreach (glob(dirname(DB_PATH) . '/.salt_*') as $f) {
-            if ($f !== $saltFile && @filemtime($f) < strtotime('-2 days')) @unlink($f);
+            if ($f !== $saltFile && filemtime($f) < strtotime('-2 days')) @unlink($f);
         }
     }
     $salt = file_get_contents($saltFile);
@@ -144,10 +142,7 @@ function initDb(): SQLite3 {
 // ---- Main ----
 
 $ua = $_SERVER['HTTP_USER_AGENT'] ?? '';
-// Only honor X-Forwarded-For when TRUST_PROXY is explicitly enabled.
-// Otherwise attackers could spoof IPs to bypass EXCLUDED_IPS or poison geo data.
-$trustProxy = defined('TRUST_PROXY') && TRUST_PROXY;
-$ip = ($trustProxy && isset($_SERVER['HTTP_X_FORWARDED_FOR']))
+$ip = isset($_SERVER['HTTP_X_FORWARDED_FOR'])
     ? trim(explode(',', $_SERVER['HTTP_X_FORWARDED_FOR'])[0])
     : ($_SERVER['REMOTE_ADDR'] ?? '');
 
@@ -160,17 +155,10 @@ $page     = sanitize($_GET['p'] ?? '/', 255);
 $page = preg_replace('|/index\.html?$|i', '/', $page);
 $page = preg_replace('|/index\.php$|i', '/', $page);
 // Strip .html/.htm and .php extensions to unify clean-URL and file-extension variants
-$page = preg_replace('|\.(?:html?|php)$|i', '', $page);
+$page = preg_replace('#\.(?:html?|php)$#i', '', $page);
 if ($page === '') $page = '/';
 $referrer = sanitize($_GET['r']     ?? '', 512);
 $title    = sanitize($_GET['title'] ?? '', 255);
-
-// Strip query string and fragment from referrer for privacy.
-// Avoids storing tokens, session ids, emails, etc. that may appear in
-// ?param=... of the source URL.
-if ($referrer !== '') {
-    $referrer = preg_replace('/[?#].*$/', '', $referrer);
-}
 
 $host = $_SERVER['HTTP_HOST'] ?? '';
 if ($host && strpos($referrer, $host) !== false) $referrer = '';
